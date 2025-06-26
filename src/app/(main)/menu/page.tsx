@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState } from 'react';
@@ -65,39 +66,39 @@ export default function MenuPage() {
             <section key={category.id}>
                  <h2 className="text-2xl font-headline mb-4">{category.name}</h2>
                  <Separator className="mb-6"/>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
                 {products.filter(p => p.categoryId === category.id).map((product) => (
                     <Card
                     key={product.id}
-                    className="overflow-hidden cursor-pointer hover:shadow-lg transition-shadow"
+                    className="overflow-hidden cursor-pointer hover:shadow-lg transition-shadow flex md:flex-col md:h-full"
                     onClick={() => setSelectedProduct(product)}
                     >
-                    <div className="relative h-48 w-full">
-                        <Image
-                        src={product.image}
-                        alt={product.name}
-                        layout="fill"
-                        objectFit="cover"
-                        data-ai-hint={product['data-ai-hint']}
-                        />
-                    </div>
-                    <CardContent className="p-4">
-                        <div className="flex justify-between items-start">
-                        <h3 className="font-semibold text-lg">{product.name}</h3>
-                        <div className="text-right">
-                        {product.offerPrice ? (
-                            <>
-                            <p className="text-primary font-bold text-lg">${product.offerPrice.toLocaleString('es-CL')}</p>
-                            <p className="text-muted-foreground line-through text-sm">${product.price.toLocaleString('es-CL')}</p>
-                            </>
-                        ) : (
-                            <p className="font-bold text-lg text-foreground">${product.price.toLocaleString('es-CL')}</p>
-                        )}
+                        <div className="relative h-28 w-28 md:h-48 md:w-full flex-shrink-0">
+                            <Image
+                            src={product.image}
+                            alt={product.name}
+                            layout="fill"
+                            objectFit="cover"
+                            data-ai-hint={product['data-ai-hint']}
+                            />
                         </div>
-                    </div>
-                        <p className="text-sm text-muted-foreground mt-1">{product.description}</p>
-                        <AllergenInfo allergenIds={product.allergens} />
-                    </CardContent>
+                        <CardContent className="p-3 md:p-4 flex-grow flex flex-col justify-center">
+                            <div className="flex justify-between items-start gap-2">
+                                <h3 className="font-semibold text-base md:text-lg leading-tight">{product.name}</h3>
+                                <div className="text-right flex-shrink-0">
+                                    {product.offerPrice ? (
+                                        <>
+                                        <p className="text-primary font-bold text-base md:text-lg">${product.offerPrice.toLocaleString('es-CL')}</p>
+                                        <p className="text-muted-foreground line-through text-xs md:text-sm">${product.price.toLocaleString('es-CL')}</p>
+                                        </>
+                                    ) : (
+                                        <p className="font-bold text-base md:text-lg text-foreground">${product.price.toLocaleString('es-CL')}</p>
+                                    )}
+                                </div>
+                            </div>
+                            <p className="text-sm text-muted-foreground mt-1 line-clamp-2 md:line-clamp-none">{product.description}</p>
+                            <AllergenInfo allergenIds={product.allergens} />
+                        </CardContent>
                     </Card>
                 ))}
                 </div>
