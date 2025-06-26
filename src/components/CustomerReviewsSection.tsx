@@ -88,8 +88,8 @@ export function CustomerReviewsSection({ reviews }: CustomerReviewsSectionProps)
                             </CarouselItem>
                             ))}
                         </CarouselContent>
-                        <CarouselPrevious className="absolute left-2 lg:-left-8 top-1/2 -translate-y-1/2" />
-                        <CarouselNext className="absolute right-2 lg:-right-8 top-1/2 -translate-y-1/2" />
+                        <CarouselPrevious className="absolute -left-4 lg:-left-8 top-1/2 -translate-y-1/2" />
+                        <CarouselNext className="absolute -right-4 lg:-right-8 top-1/2 -translate-y-1/2" />
                     </Carousel>
                 </CardContent>
             </Card>
