@@ -85,7 +85,7 @@ export function CustomerReviewsSection({ reviews }: CustomerReviewsSectionProps)
                         <CarouselContent>
                             {reviews.map((review, index) => (
                             <CarouselItem key={index}>
-                                <div className="p-1 text-center min-h-[10rem] flex flex-col justify-center items-center px-10">
+                                <div className="p-1 text-center min-h-[12rem] flex flex-col justify-center items-center px-10">
                                     <p className="text-muted-foreground italic mb-4">&quot;{review.text}&quot;</p>
 
                                     <p className="font-semibold">{review.author}</p>
@@ -93,8 +93,8 @@ export function CustomerReviewsSection({ reviews }: CustomerReviewsSectionProps)
                             </CarouselItem>
                             ))}
                         </CarouselContent>
-                        <CarouselPrevious className="absolute left-2 top-2/3 -translate-y-1/2" />
-                        <CarouselNext className="absolute right-2 top-2/3 -translate-y-1/2" />
+                        <CarouselPrevious className="absolute -left-2 top-[70%] -translate-y-1/2" />
+                        <CarouselNext className="absolute -right-2 top-[70%] -translate-y-1/2" />
                     </Carousel>
                 </CardContent>
             </Card>
