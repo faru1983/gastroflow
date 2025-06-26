@@ -79,10 +79,6 @@ export function CustomerReviewsSection({ reviews }: CustomerReviewsSectionProps)
                             <CarouselItem key={index}>
                                 <div className="p-1 text-center px-8">
                                     <p className="text-muted-foreground italic mb-4 h-20">&quot;{review.text}&quot;</p>
-                                    <div className="flex justify-center items-center gap-1 mb-2">
-                                        {Array.from({length: review.rating}).map((_, i) => <Star key={i} className="w-5 h-5 text-yellow-500 fill-yellow-500" />)}
-                                        {Array.from({length: 5 - review.rating}).map((_, i) => <Star key={i + review.rating} className="w-5 h-5 text-muted-foreground opacity-50" />)}
-                                    </div>
                                     <p className="font-semibold">{review.author}</p>
                                 </div>
                             </CarouselItem>
