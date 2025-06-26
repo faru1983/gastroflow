@@ -13,7 +13,6 @@ import { GoogleIcon } from './icons/GoogleIcon';
 type Review = {
     text: string;
     author: string;
-    rating: number;
 };
 
 interface CustomerReviewsSectionProps {
@@ -29,7 +28,7 @@ const renderStars = (rating: number) => {
       if (i <= rating) {
         stars.push(<Star key={`star-full-${i}`} className="w-5 h-5 text-yellow-500 fill-yellow-500" />);
       } else if (i - 0.5 <= rating) {
-        stars.push(<StarHalf key={`star-half-${i}`} className="w-5 h-5 text-yellow-500 fill-yellow-500 stroke-yellow-500" />);
+        stars.push(<StarHalf key={`star-half-${i}`} className="w-5 h-5 text-yellow-500 fill-yellow-500" />);
       } else {
         stars.push(<Star key={`star-empty-${i}`} className="w-5 h-5 text-yellow-500" />);
       }
@@ -78,7 +77,7 @@ export function CustomerReviewsSection({ reviews }: CustomerReviewsSectionProps)
                             {reviews.map((review, index) => (
                             <CarouselItem key={index}>
                                 <div className="p-1 text-center px-8">
-                                    <p className="text-muted-foreground italic mb-4 h-20">&quot;{review.text}&quot;</p>
+                                    <p className="text-muted-foreground italic mb-4 min-h-[5rem]">&quot;{review.text}&quot;</p>
                                     <p className="font-semibold">{review.author}</p>
                                 </div>
                             </CarouselItem>
