@@ -42,7 +42,15 @@ function LoggedInView() {
     const { toast } = useToast();
     
     // Local state for form fields to not affect context until save
-    const [formData, setFormData] = useState(user);
+    const [formData, setFormData] = useState({
+        ...user,
+        nombre: user?.nombre || '',
+        apellidos: user?.apellidos || '',
+        fechaNacimiento: user?.fechaNacimiento || '',
+        comuna: user?.comuna || '',
+        instagram: user?.instagram || '',
+        celular: user?.celular || '',
+    });
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setFormData({ ...formData!, [e.target.name]: e.target.value });
@@ -72,13 +80,13 @@ function LoggedInView() {
                 </CardHeader>
                 <CardContent className="space-y-4">
                     <div className="grid md:grid-cols-2 gap-4">
-                        <div><Label>Nombre</Label><Input name="nombre" value={formData.nombre} onChange={handleInputChange} disabled={!isEditing} /></div>
-                        <div><Label>Apellidos</Label><Input name="apellidos" value={formData.apellidos} onChange={handleInputChange} disabled={!isEditing} /></div>
-                        <div><Label>Fecha de Nacimiento</Label><Input name="fechaNacimiento" type="date" value={formData.fechaNacimiento} onChange={handleInputChange} disabled={!isEditing} /></div>
-                        <div><Label>Comuna</Label><Input name="comuna" value={formData.comuna} onChange={handleInputChange} disabled={!isEditing} /></div>
-                        <div><Label>Instagram</Label><Input name="instagram" value={formData.instagram} onChange={handleInputChange} disabled={!isEditing} /></div>
-                        <div><Label>Email</Label><Input name="email" type="email" value={formData.email} onChange={handleInputChange} disabled={!isEditing} /></div>
-                        <div><Label>Celular</Label><Input name="celular" value={formData.celular} onChange={handleInputChange} disabled={!isEditing} /></div>
+                        <div><Label>Nombre</Label><Input name="nombre" value={formData.nombre || ''} onChange={handleInputChange} disabled={!isEditing} /></div>
+                        <div><Label>Apellidos</Label><Input name="apellidos" value={formData.apellidos || ''} onChange={handleInputChange} disabled={!isEditing} /></div>
+                        <div><Label>Fecha de Nacimiento</Label><Input name="fechaNacimiento" type="date" value={formData.fechaNacimiento || ''} onChange={handleInputChange} disabled={!isEditing} /></div>
+                        <div><Label>Comuna</Label><Input name="comuna" value={formData.comuna || ''} onChange={handleInputChange} disabled={!isEditing} /></div>
+                        <div><Label>Instagram</Label><Input name="instagram" value={formData.instagram || ''} onChange={handleInputChange} disabled={!isEditing} /></div>
+                        <div><Label>Email</Label><Input name="email" type="email" value={formData.email || ''} onChange={handleInputChange} disabled={!isEditing} /></div>
+                        <div><Label>Celular</Label><Input name="celular" value={formData.celular || ''} onChange={handleInputChange} disabled={!isEditing} /></div>
                     </div>
                      {isEditing && (
                         <>
@@ -114,7 +122,7 @@ function LoggedInView() {
                     {isEditing ? (
                         <div className="flex gap-2">
                             <Button onClick={handleUpdate}>Guardar Cambios</Button>
-                            <Button variant="ghost" onClick={() => { setIsEditing(false); setFormData(user);}}>Cancelar</Button>
+                            <Button variant="ghost" onClick={() => { setIsEditing(false); setFormData({...user, nombre: user?.nombre || ''});}}>Cancelar</Button>
                         </div>
                     ) : (
                         <Button onClick={() => setIsEditing(true)}>Actualizar Datos</Button>

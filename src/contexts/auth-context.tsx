@@ -12,7 +12,7 @@ interface AuthContextType {
   closeAuthModal: () => void;
   login: (email: string, pass: string) => Promise<boolean>;
   logout: () => void;
-  register: (userData: Omit<User, 'id'>) => Promise<boolean>;
+  register: (userData: { email: string, password: string, promociones: boolean }) => Promise<boolean>;
   updateUser: (userData: Partial<User>) => void;
 }
 
@@ -59,12 +59,16 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setUser(null);
   };
 
-  const register = async (userData: Omit<User, 'id'>): Promise<boolean> => {
+  const register = async (userData: { email: string, password: string, promociones: boolean }): Promise<boolean> => {
     // Mock register logic
-    console.log('Registering user:', userData);
+    console.log('Registering user:', userData.email);
     return new Promise(resolve => {
       setTimeout(() => {
-        const newUser = { ...userData, id: '1' };
+        const newUser: User = { 
+          id: '1', 
+          email: userData.email,
+          promociones: userData.promociones
+        };
         setUser(newUser);
         closeAuthModal();
          if (onLoginSuccess) {

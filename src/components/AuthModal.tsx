@@ -18,6 +18,7 @@ import { Input } from '@/components/ui/input';
 import {
   Form,
   FormControl,
+  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -25,6 +26,8 @@ import {
 } from '@/components/ui/form';
 import { useToast } from '@/hooks/use-toast';
 import { Loader2 } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { Switch } from './ui/switch';
 
 const loginSchema = z.object({
   email: z.string().email('Email no válido.'),
@@ -32,13 +35,7 @@ const loginSchema = z.object({
 });
 
 const registerSchema = z.object({
-  nombre: z.string().min(1, 'Nombre es requerido.'),
-  apellidos: z.string().min(1, 'Apellidos son requeridos.'),
-  fechaNacimiento: z.string().min(1, 'Fecha de nacimiento es requerida.'),
-  comuna: z.string().min(1, 'Comuna es requerida.'),
-  instagram: z.string().optional(),
   email: z.string().email('Email no válido.'),
-  celular: z.string().min(1, 'Celular es requerido.'),
   password: z.string().min(8, 'La contraseña debe tener al menos 8 caracteres.'),
   promociones: z.boolean().default(false),
 });
@@ -48,6 +45,7 @@ export function AuthModal() {
   const [activeTab, setActiveTab] = useState("login");
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
+  const router = useRouter();
 
   const loginForm = useForm<z.infer<typeof loginSchema>>({
     resolver: zodResolver(loginSchema),
@@ -57,13 +55,7 @@ export function AuthModal() {
   const registerForm = useForm<z.infer<typeof registerSchema>>({
     resolver: zodResolver(registerSchema),
     defaultValues: {
-      nombre: '',
-      apellidos: '',
-      fechaNacimiento: '',
-      comuna: '',
-      instagram: '',
       email: '',
-      celular: '',
       password: '',
       promociones: false,
     },
@@ -84,21 +76,17 @@ export function AuthModal() {
 
   const onRegisterSubmit = async (values: z.infer<typeof registerSchema>) => {
     setIsLoading(true);
-    const { password, ...userData } = values;
-    const success = await register(userData);
+    const success = await register(values);
     if (!success) {
       toast({
         variant: "destructive",
         title: "Error de registro",
         description: "No se pudo crear la cuenta. Intente nuevamente.",
       });
+       setIsLoading(false);
     } else {
-        toast({
-        title: "¡Bienvenido!",
-        description: "Tu cuenta ha sido creada exitosamente.",
-      });
+      router.push('/complete-profile');
     }
-    setIsLoading(false);
   };
 
   return (
@@ -151,18 +139,31 @@ export function AuthModal() {
           </TabsContent>
           <TabsContent value="registrar">
             <Form {...registerForm}>
-              <form onSubmit={registerForm.handleSubmit(onRegisterSubmit)} className="space-y-2 pt-4 max-h-[60vh] overflow-y-auto pr-2">
-                <FormField name="nombre" control={registerForm.control} render={({ field }) => (<FormItem><FormControl><Input placeholder="Nombre" {...field} /></FormControl><FormMessage /></FormItem>)} />
-                <FormField name="apellidos" control={registerForm.control} render={({ field }) => (<FormItem><FormControl><Input placeholder="Apellidos" {...field} /></FormControl><FormMessage /></FormItem>)} />
-                <FormField name="fechaNacimiento" control={registerForm.control} render={({ field }) => (<FormItem><FormLabel>Fecha de Nacimiento</FormLabel><FormControl><Input type="date" {...field} /></FormControl><FormMessage /></FormItem>)} />
-                <FormField name="comuna" control={registerForm.control} render={({ field }) => (<FormItem><FormControl><Input placeholder="Comuna" {...field} /></FormControl><FormMessage /></FormItem>)} />
-                <FormField name="instagram" control={registerForm.control} render={({ field }) => (<FormItem><FormControl><Input placeholder="Instagram (opcional)" {...field} /></FormControl><FormMessage /></FormItem>)} />
+               <form onSubmit={registerForm.handleSubmit(onRegisterSubmit)} className="space-y-4 pt-4">
                 <FormField name="email" control={registerForm.control} render={({ field }) => (<FormItem><FormControl><Input type="email" placeholder="E-mail" {...field} /></FormControl><FormMessage /></FormItem>)} />
-                <FormField name="celular" control={registerForm.control} render={({ field }) => (<FormItem><FormControl><Input placeholder="Celular" {...field} /></FormControl><FormMessage /></FormItem>)} />
                 <FormField name="password" control={registerForm.control} render={({ field }) => (<FormItem><FormControl><Input type="password" placeholder="Contraseña" {...field} /></FormControl><FormMessage /></FormItem>)} />
-                
+                <FormField
+                  control={registerForm.control}
+                  name="promociones"
+                  render={({ field }) => (
+                    <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3">
+                      <div className="space-y-0.5">
+                        <FormLabel>Mensajes Promocionales</FormLabel>
+                        <FormDescription className="text-xs">
+                          Recibe ofertas y noticias en tu email.
+                        </FormDescription>
+                      </div>
+                      <FormControl>
+                        <Switch
+                          checked={field.value}
+                          onCheckedChange={field.onChange}
+                        />
+                      </FormControl>
+                    </FormItem>
+                  )}
+                />
                 <Button type="submit" className="w-full bg-accent hover:bg-accent/90" disabled={isLoading}>
-                  {isLoading ? <Loader2 className="animate-spin" /> : 'Registrar'}
+                  {isLoading ? <Loader2 className="animate-spin" /> : 'Continuar'}
                 </Button>
               </form>
             </Form>

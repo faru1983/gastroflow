@@ -1,12 +1,12 @@
 export interface User {
   id: string;
-  nombre: string;
-  apellidos: string;
-  fechaNacimiento: string;
-  comuna: string;
-  instagram: string;
+  nombre?: string;
+  apellidos?: string;
+  fechaNacimiento?: string;
+  comuna?: string;
+  instagram?: string;
   email: string;
-  celular: string;
+  celular?: string;
   promociones: boolean;
 }
 
