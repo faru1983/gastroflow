@@ -24,9 +24,7 @@ const REVIEW_COUNT = 182;
 
 const HalfStarIcon = () => (
   <div className="relative inline-block h-5 w-5">
-    {/* Background star (empty outline) */}
     <Star className="h-5 w-5 text-yellow-500" />
-    {/* Foreground star (filled), clipped to 50% width */}
     <div className="absolute top-0 left-0 h-full w-1/2 overflow-hidden">
       <Star className="h-5 w-5 fill-yellow-500 text-yellow-500" />
     </div>
@@ -87,15 +85,16 @@ export function CustomerReviewsSection({ reviews }: CustomerReviewsSectionProps)
                         <CarouselContent>
                             {reviews.map((review, index) => (
                             <CarouselItem key={index}>
-                                <div className="p-1 text-center min-h-[7rem] flex flex-col justify-center items-center px-4">
+                                <div className="p-1 text-center min-h-[10rem] flex flex-col justify-center items-center px-10">
                                     <p className="text-muted-foreground italic mb-4">&quot;{review.text}&quot;</p>
+
                                     <p className="font-semibold">{review.author}</p>
                                 </div>
                             </CarouselItem>
                             ))}
                         </CarouselContent>
-                        <CarouselPrevious className="absolute left-0 top-1/2 -translate-y-1/2" />
-                        <CarouselNext className="absolute right-0 top-1/2 -translate-y-1/2" />
+                        <CarouselPrevious className="absolute left-2 top-1/2 -translate-y-1/2" />
+                        <CarouselNext className="absolute right-2 top-1/2 -translate-y-1/2" />
                     </Carousel>
                 </CardContent>
             </Card>
