@@ -29,7 +29,7 @@ const renderStars = (rating: number) => {
       if (i <= rating) {
         stars.push(<Star key={`star-full-${i}`} className="w-5 h-5 text-yellow-500 fill-yellow-500" />);
       } else if (i - 0.5 <= rating) {
-        stars.push(<StarHalf key={`star-half-${i}`} className="w-5 h-5 text-yellow-500 fill-yellow-500" />);
+        stars.push(<StarHalf key={`star-half-${i}`} className="w-5 h-5 text-yellow-500 fill-yellow-500 stroke-yellow-500" />);
       } else {
         stars.push(<Star key={`star-empty-${i}`} className="w-5 h-5 text-yellow-500" />);
       }
@@ -45,7 +45,7 @@ export function CustomerReviewsSection({ reviews }: CustomerReviewsSectionProps)
 
     return (
         <div className="flex flex-col space-y-4 h-full">
-            <Card>
+             <Card>
                 <CardContent className="p-4 flex items-center justify-center">
                      <div 
                         className="flex items-center justify-center gap-3 p-2 rounded-lg hover:bg-muted cursor-pointer"
@@ -62,7 +62,6 @@ export function CustomerReviewsSection({ reviews }: CustomerReviewsSectionProps)
                     </div>
                 </CardContent>
             </Card>
-
             <Card className="flex-grow flex flex-col">
                 <CardHeader className="pb-2">
                     <CardTitle className="font-headline text-2xl">¿Qué dicen nuestros clientes?</CardTitle>
@@ -89,8 +88,8 @@ export function CustomerReviewsSection({ reviews }: CustomerReviewsSectionProps)
                             </CarouselItem>
                             ))}
                         </CarouselContent>
-                        <CarouselPrevious className="absolute -left-2 sm:-left-8 top-1/2 -translate-y-1/2" />
-                        <CarouselNext className="absolute -right-2 sm:-right-8 top-1/2 -translate-y-1/2" />
+                        <CarouselPrevious className="absolute left-2 lg:-left-8 top-1/2 -translate-y-1/2" />
+                        <CarouselNext className="absolute right-2 lg:-right-8 top-1/2 -translate-y-1/2" />
                     </Carousel>
                 </CardContent>
             </Card>

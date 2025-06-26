@@ -71,7 +71,7 @@ export default async function HomePage() {
             {summary}
           </p>
           <p className="mt-2 text-lg text-foreground/80">
-             En GastroFlow, cada plato es una obra de arte, preparada con ingredientes frescos y una pasión que se siente en cada bocado. ¡Te esperamos!
+             En GastroFlow, cada plato es una obra de arte, preparada con ingredientes frescos y una pasión que se siente en cada bocado. Sumérgete en una atmósfera acogedora y déjate llevar por sabores que cuentan una historia. ¡Te esperamos para crear momentos inolvidables!
           </p>
         </section>
 
@@ -85,7 +85,7 @@ export default async function HomePage() {
 
         <Separator className="my-8" />
         
-        <section className="grid md:grid-cols-2 gap-8 items-stretch">
+        <section className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-stretch">
             <CustomerReviewsSection reviews={customerReviews} />
 
             <Card className="h-full flex flex-col">
@@ -123,7 +123,7 @@ export default async function HomePage() {
 
         <section className="text-center">
             <h3 className="text-2xl font-headline mb-4">Síguenos</h3>
-            <div className="flex justify-center items-center gap-6">
+            <div className="flex justify-center items-center gap-6 flex-wrap">
                 <a href="#" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-primary"><FacebookIcon className="w-7 h-7"/></a>
                 <a href="#" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-primary"><InstagramIcon className="w-7 h-7"/></a>
                 <a href="#" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-primary"><TiktokIcon className="w-7 h-7"/></a>
