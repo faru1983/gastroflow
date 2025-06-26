@@ -31,7 +31,7 @@ const renderStars = (rating: number) => {
       } else if (i - 0.5 <= rating) {
         stars.push(<StarHalf key={`star-half-${i}`} className="w-5 h-5 text-yellow-500 fill-yellow-500" />);
       } else {
-        stars.push(<Star key={`star-empty-${i}`} className="w-5 h-5 text-muted-foreground opacity-50" />);
+        stars.push(<Star key={`star-empty-${i}`} className="w-5 h-5 text-yellow-500" />);
       }
     }
     return stars;
@@ -89,8 +89,8 @@ export function CustomerReviewsSection({ reviews }: CustomerReviewsSectionProps)
                             </CarouselItem>
                             ))}
                         </CarouselContent>
-                        <CarouselPrevious className="absolute left-2 top-1/2 -translate-y-1/2" />
-                        <CarouselNext className="absolute right-2 top-1/2 -translate-y-1/2" />
+                        <CarouselPrevious className="absolute -left-2 sm:-left-8 top-1/2 -translate-y-1/2" />
+                        <CarouselNext className="absolute -right-2 sm:-right-8 top-1/2 -translate-y-1/2" />
                     </Carousel>
                 </CardContent>
             </Card>
