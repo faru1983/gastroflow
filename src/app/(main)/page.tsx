@@ -79,7 +79,7 @@ export default async function HomePage() {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <Link href="/menu" passHref><Button size="lg" className="w-full py-8 text-lg"><BookOpenText/>Nuestra Carta</Button></Link>
                 <Link href="/reservations" passHref><Button size="lg" className="w-full py-8 text-lg"><CalendarClock/>Reservar Mesa</Button></Link>
-                <Link href="/loyalty" passHref><Button size="lg" className="w-full py-8 text-lg"><Heart/>Fidelización</Button></Link>
+                <Link href="/loyalty" passHref><Button size="lg" className="w-full py-8 text-lg"><Heart/>Registrar Visita</Button></Link>
             </div>
         </section>
 

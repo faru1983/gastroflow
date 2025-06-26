@@ -28,6 +28,7 @@ export const categories: Category[] = [
 ];
 
 export const products: Product[] = [
+  // Entradas
   {
     id: '1',
     name: 'Ceviche Clásico',
@@ -50,6 +51,27 @@ export const products: Product[] = [
     allergens: ['gluten', 'lacteos'],
   },
   {
+    id: '8',
+    name: 'Pulpo al Olivo',
+    description: 'Finas láminas de pulpo bañadas en una cremosa salsa de aceitunas de botija.',
+    price: 13800,
+    image: 'https://placehold.co/600x400.png',
+    'data-ai-hint': 'octopus appetizer',
+    categoryId: 'entradas',
+    allergens: ['mariscos'],
+  },
+  {
+    id: '9',
+    name: 'Provoleta al Orégano',
+    description: 'Queso provolone derretido a la plancha con un toque de orégano y aceite de oliva.',
+    price: 9900,
+    image: 'https://placehold.co/600x400.png',
+    'data-ai-hint': 'melted cheese',
+    categoryId: 'entradas',
+    allergens: ['lacteos'],
+  },
+  // Platos Principales
+  {
     id: '3',
     name: 'Lomo Saltado',
     description: 'Trozos de lomo de res salteados con cebolla, tomate y papas fritas, acompañado de arroz.',
@@ -70,6 +92,27 @@ export const products: Product[] = [
     allergens: [],
   },
   {
+    id: '10',
+    name: 'Risotto de Champiñones',
+    description: 'Cremoso risotto preparado con una variedad de champiñones frescos y queso parmesano.',
+    price: 14500,
+    image: 'https://placehold.co/600x400.png',
+    'data-ai-hint': 'mushroom risotto',
+    categoryId: 'platos-principales',
+    allergens: ['lacteos'],
+  },
+  {
+    id: '11',
+    name: 'Costillar de Cerdo BBQ',
+    description: 'Tierno costillar de cerdo cocido lentamente y bañado en nuestra salsa BBQ casera.',
+    price: 18500,
+    image: 'https://placehold.co/600x400.png',
+    'data-ai-hint': 'pork ribs',
+    categoryId: 'platos-principales',
+    allergens: [],
+  },
+  // Postres
+  {
     id: '5',
     name: 'Tiramisú',
     description: 'Postre italiano clásico con capas de bizcocho, café, mascarpone y cacao.',
@@ -80,6 +123,27 @@ export const products: Product[] = [
     allergens: ['gluten', 'lacteos'],
   },
   {
+    id: '12',
+    name: 'Cheesecake de Maracuyá',
+    description: 'Suave cheesecake sobre una base de galleta, cubierto con una salsa de maracuyá.',
+    price: 7200,
+    image: 'https://placehold.co/600x400.png',
+    'data-ai-hint': 'passionfruit cheesecake',
+    categoryId: 'postres',
+    allergens: ['gluten', 'lacteos'],
+  },
+  {
+    id: '13',
+    name: 'Volcán de Chocolate',
+    description: 'Queque tibio con centro de chocolate líquido, acompañado de helado de vainilla.',
+    price: 7500,
+    image: 'https://placehold.co/600x400.png',
+    'data-ai-hint': 'chocolate lava',
+    categoryId: 'postres',
+    allergens: ['gluten', 'lacteos'],
+  },
+  // Bebidas
+  {
     id: '6',
     name: 'Mote con Huesillo',
     description: 'Bebida tradicional chilena con duraznos secos y trigo mote.',
@@ -89,13 +153,33 @@ export const products: Product[] = [
     categoryId: 'bebidas',
     allergens: ['gluten'],
   },
-   {
+  {
     id: '7',
     name: 'Pisco Sour',
     description: 'Cóctel emblemático preparado con pisco, jugo de limón y clara de huevo.',
     price: 5500,
     image: 'https://placehold.co/600x400.png',
     'data-ai-hint': 'pisco sour',
+    categoryId: 'bebidas',
+    allergens: [],
+  },
+  {
+    id: '14',
+    name: 'Jugo Natural',
+    description: 'Refrescante jugo de fruta de la estación (consultar por sabores disponibles).',
+    price: 3800,
+    image: 'https://placehold.co/600x400.png',
+    'data-ai-hint': 'fresh juice',
+    categoryId: 'bebidas',
+    allergens: [],
+  },
+  {
+    id: '15',
+    name: 'Copa de Vino Reserva',
+    description: 'Selección de vinos reserva de viñas chilenas (Cabernet, Carmenere, Sauvignon Blanc).',
+    price: 6000,
+    image: 'https://placehold.co/600x400.png',
+    'data-ai-hint': 'glass wine',
     categoryId: 'bebidas',
     allergens: [],
   },

@@ -8,8 +8,8 @@ import { cn } from '@/lib/utils';
 const navItems = [
   { href: '/', label: 'Inicio', icon: Home },
   { href: '/menu', label: 'Carta', icon: BookOpenText },
-  { href: '/loyalty', label: 'Fidelización', icon: Heart },
   { href: '/reservations', label: 'Reservas', icon: CalendarClock },
+  { href: '/loyalty', label: 'Fidelización', icon: Heart },
   { href: '/profile', label: 'Mi Perfil', icon: CircleUserRound },
 ];
 
