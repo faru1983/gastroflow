@@ -1,0 +1,108 @@
+"use client";
+
+import React, { createContext, useState, useContext, ReactNode } from 'react';
+import type { User } from '@/lib/types';
+import { mockUser } from '@/lib/data';
+
+interface AuthContextType {
+  user: User | null;
+  isAuthenticated: boolean;
+  isAuthModalOpen: boolean;
+  showAuthModal: (onSuccess?: () => void) => void;
+  closeAuthModal: () => void;
+  login: (email: string, pass: string) => Promise<boolean>;
+  logout: () => void;
+  register: (userData: Omit<User, 'id'>) => Promise<boolean>;
+  updateUser: (userData: Partial<User>) => void;
+}
+
+const AuthContext = createContext<AuthContextType | undefined>(undefined);
+
+export const AuthProvider = ({ children }: { children: ReactNode }) => {
+  const [user, setUser] = useState<User | null>(null);
+  const [isAuthModalOpen, setAuthModalOpen] = useState(false);
+  const [onLoginSuccess, setOnLoginSuccess] = useState<(() => void) | null>(null);
+
+  const showAuthModal = (onSuccess?: () => void) => {
+    if (onSuccess) {
+      setOnLoginSuccess(() => onSuccess);
+    }
+    setAuthModalOpen(true);
+  };
+
+  const closeAuthModal = () => {
+    setAuthModalOpen(false);
+    setOnLoginSuccess(null);
+  };
+
+  const login = async (email: string, pass: string): Promise<boolean> => {
+    // Mock login logic
+    console.log(`Attempting login with ${email}`);
+    return new Promise(resolve => {
+      setTimeout(() => {
+        if (email === 'ana.perez@example.com' && pass === 'password') {
+          setUser(mockUser);
+          closeAuthModal();
+          if (onLoginSuccess) {
+            onLoginSuccess();
+            setOnLoginSuccess(null);
+          }
+          resolve(true);
+        } else {
+          resolve(false);
+        }
+      }, 1000);
+    });
+  };
+
+  const logout = () => {
+    setUser(null);
+  };
+
+  const register = async (userData: Omit<User, 'id'>): Promise<boolean> => {
+    // Mock register logic
+    console.log('Registering user:', userData);
+    return new Promise(resolve => {
+      setTimeout(() => {
+        const newUser = { ...userData, id: '1' };
+        setUser(newUser);
+        closeAuthModal();
+         if (onLoginSuccess) {
+            onLoginSuccess();
+            setOnLoginSuccess(null);
+          }
+        resolve(true);
+      }, 1000);
+    });
+  };
+
+  const updateUser = (userData: Partial<User>) => {
+    if (user) {
+      setUser(prevUser => ({ ...prevUser!, ...userData }));
+    }
+  }
+
+  return (
+    <AuthContext.Provider value={{ 
+      user, 
+      isAuthenticated: !!user, 
+      isAuthModalOpen, 
+      showAuthModal, 
+      closeAuthModal, 
+      login, 
+      logout,
+      register,
+      updateUser
+    }}>
+      {children}
+    </AuthContext.Provider>
+  );
+};
+
+export const useAuth = () => {
+  const context = useContext(AuthContext);
+  if (context === undefined) {
+    throw new Error('useAuth must be used within an AuthProvider');
+  }
+  return context;
+};
