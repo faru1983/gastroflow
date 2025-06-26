@@ -8,7 +8,7 @@ export default function MainLayout({
 }) {
   return (
     <>
-      <main className="pb-24 md:pb-0">{children}</main>
+      <main className="pb-24">{children}</main>
       <BottomNav />
       <AuthModal />
     </>
