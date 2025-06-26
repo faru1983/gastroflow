@@ -1,6 +1,6 @@
 "use client";
 
-import { useForm, Controller } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { Button } from '@/components/ui/button';
@@ -9,7 +9,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { Form, FormControl, FormField, FormItem, FormMessage } from '@/components/ui/form';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/auth-context';
 import { CalendarIcon, Loader2 } from 'lucide-react';
@@ -21,7 +21,7 @@ import { useEffect, useState } from 'react';
 const reservationSchema = z.object({
   date: z.date({ required_error: 'La fecha es requerida.' }),
   time: z.string({ required_error: 'La hora es requerida.' }),
-  people: z.coerce.number().min(1).max(8),
+  people: z.coerce.number({ required_error: "La cantidad de personas es requerida."}).min(1, "Debe seleccionar al menos 1 persona.").max(8, "Máximo 8 personas."),
   preference: z.string({ required_error: 'La preferencia es requerida.' }),
   reason: z.string({ required_error: 'El motivo es requerido.' }),
   comments: z.string().optional(),
@@ -45,7 +45,7 @@ export default function ReservationsPage() {
   const form = useForm<z.infer<typeof reservationSchema>>({
     resolver: zodResolver(reservationSchema),
     defaultValues: {
-      people: 2,
+      people: undefined,
       comments: '',
       nombre: '',
       apellidos: '',
@@ -79,8 +79,6 @@ export default function ReservationsPage() {
         toast({ title: 'Datos cargados', description: 'Tus datos han sido cargados en el formulario.' });
     } else {
         showAuthModal(() => {
-            // This callback will be executed after successful login
-            // The useEffect will handle the prefill
             toast({ title: '¡Bienvenido!', description: 'Ahora puedes cargar tus datos.' });
         });
     }
@@ -110,16 +108,15 @@ export default function ReservationsPage() {
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
             <div className="space-y-4 p-6 border rounded-lg">
                 <h3 className="text-lg font-semibold">Datos de la Reserva</h3>
-                <div className="grid md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-2 gap-4">
                     <FormField control={form.control} name="date" render={({ field }) => (
                          <FormItem className="flex flex-col">
-                            <FormLabel>Fecha</FormLabel>
                             <Popover>
                                 <PopoverTrigger asChild>
                                 <FormControl>
-                                    <Button variant={"outline"} className={cn("pl-3 text-left font-normal", !field.value && "text-muted-foreground")}>
+                                    <Button variant={"outline"} className={cn("pl-3 text-left font-normal justify-start", !field.value && "text-muted-foreground")}>
+                                    <CalendarIcon className="mr-2 h-4 w-4 opacity-50" />
                                     {field.value ? format(field.value, "PPP", { locale: es }) : <span>Elige una fecha</span>}
-                                    <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
                                     </Button>
                                 </FormControl>
                                 </PopoverTrigger>
@@ -132,8 +129,7 @@ export default function ReservationsPage() {
                     )} />
                      <FormField control={form.control} name="time" render={({ field }) => (
                         <FormItem>
-                            <FormLabel>Hora</FormLabel>
-                            <Select onValueChange={field.onChange} defaultValue={field.value}>
+                            <Select onValueChange={field.onChange} value={field.value}>
                                 <FormControl><SelectTrigger><SelectValue placeholder="Selecciona la hora" /></SelectTrigger></FormControl>
                                 <SelectContent>{timeSlots.map(slot => <SelectItem key={slot} value={slot}>{slot} hrs</SelectItem>)}</SelectContent>
                             </Select>
@@ -144,9 +140,8 @@ export default function ReservationsPage() {
                 <div className="grid md:grid-cols-2 gap-4">
                     <FormField control={form.control} name="people" render={({ field }) => (
                         <FormItem>
-                            <FormLabel>Cantidad de Personas</FormLabel>
-                             <Select onValueChange={(val) => field.onChange(Number(val))} defaultValue={String(field.value)}>
-                                <FormControl><SelectTrigger><SelectValue placeholder="Nº de personas" /></SelectTrigger></FormControl>
+                             <Select onValueChange={(val) => field.onChange(Number(val))} value={field.value ? String(field.value) : ""}>
+                                <FormControl><SelectTrigger><SelectValue placeholder="Cantidad de Personas" /></SelectTrigger></FormControl>
                                 <SelectContent>{Array.from({ length: 8 }, (_, i) => i + 1).map(p => <SelectItem key={p} value={String(p)}>{p} persona{p>1 && 's'}</SelectItem>)}</SelectContent>
                             </Select>
                             <FormMessage />
@@ -154,9 +149,8 @@ export default function ReservationsPage() {
                     )} />
                     <FormField control={form.control} name="preference" render={({ field }) => (
                         <FormItem>
-                            <FormLabel>Lugar de Preferencia</FormLabel>
-                             <Select onValueChange={field.onChange} defaultValue={field.value}>
-                                <FormControl><SelectTrigger><SelectValue placeholder="Preferencia" /></SelectTrigger></FormControl>
+                             <Select onValueChange={field.onChange} value={field.value}>
+                                <FormControl><SelectTrigger><SelectValue placeholder="Lugar de Preferencia" /></SelectTrigger></FormControl>
                                 <SelectContent>
                                     <SelectItem value="Interior">Interior</SelectItem>
                                     <SelectItem value="Terraza">Terraza</SelectItem>
@@ -169,8 +163,7 @@ export default function ReservationsPage() {
                 </div>
                  <FormField control={form.control} name="reason" render={({ field }) => (
                     <FormItem>
-                        <FormLabel>Motivo</FormLabel>
-                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <Select onValueChange={field.onChange} value={field.value}>
                             <FormControl><SelectTrigger><SelectValue placeholder="Motivo de la visita" /></SelectTrigger></FormControl>
                             <SelectContent>
                                 <SelectItem value="General">General</SelectItem>
@@ -185,8 +178,7 @@ export default function ReservationsPage() {
                 )} />
                 <FormField control={form.control} name="comments" render={({ field }) => (
                     <FormItem>
-                        <FormLabel>Comentarios (opcional)</FormLabel>
-                        <FormControl><Textarea placeholder="Alergias, preferencias, etc." {...field} /></FormControl>
+                        <FormControl><Textarea placeholder="Comentarios (alergias, preferencias, etc.)" {...field} /></FormControl>
                         <FormMessage />
                     </FormItem>
                 )} />
@@ -198,12 +190,12 @@ export default function ReservationsPage() {
                     <Button type="button" variant="link" onClick={handleLoadData}>Cargar Mis Datos</Button>
                 </div>
                  <div className="grid md:grid-cols-2 gap-4">
-                     <FormField control={form.control} name="nombre" render={({ field }) => (<FormItem><FormLabel>Nombre</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>)} />
-                     <FormField control={form.control} name="apellidos" render={({ field }) => (<FormItem><FormLabel>Apellidos</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>)} />
+                     <FormField control={form.control} name="nombre" render={({ field }) => (<FormItem><FormControl><Input placeholder="Nombre" {...field} /></FormControl><FormMessage /></FormItem>)} />
+                     <FormField control={form.control} name="apellidos" render={({ field }) => (<FormItem><FormControl><Input placeholder="Apellidos" {...field} /></FormControl><FormMessage /></FormItem>)} />
                  </div>
                  <div className="grid md:grid-cols-2 gap-4">
-                    <FormField control={form.control} name="email" render={({ field }) => (<FormItem><FormLabel>Email</FormLabel><FormControl><Input type="email" {...field} /></FormControl><FormMessage /></FormItem>)} />
-                    <FormField control={form.control} name="celular" render={({ field }) => (<FormItem><FormLabel>Celular</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>)} />
+                    <FormField control={form.control} name="email" render={({ field }) => (<FormItem><FormControl><Input type="email" placeholder="Email" {...field} /></FormControl><FormMessage /></FormItem>)} />
+                    <FormField control={form.control} name="celular" render={({ field }) => (<FormItem><FormControl><Input placeholder="Celular" {...field} /></FormControl><FormMessage /></FormItem>)} />
                 </div>
             </div>
 
