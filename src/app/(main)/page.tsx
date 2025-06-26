@@ -5,12 +5,13 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { Footer } from '@/components/Footer';
-import { Star, Mail, Phone, MapPin, BookOpenText, CalendarClock, Heart } from 'lucide-react';
+import { Phone, MapPin, BookOpenText, CalendarClock, Heart, Star } from 'lucide-react';
 import { TiktokIcon } from '@/components/icons/TiktokIcon';
 import { WhatsappIcon } from '@/components/icons/WhatsappIcon';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
 import { FacebookIcon } from '@/components/icons/FacebookIcon';
 import { InstagramIcon } from '@/components/icons/InstagramIcon';
+import { EmailIcon } from '@/components/icons/EmailIcon';
 
 const MOCK_REVIEWS = `
 Review 1: The food was absolutely amazing, best pasta I've had in years! The service was a bit slow, but the atmosphere made up for it.
@@ -147,7 +148,7 @@ export default async function HomePage() {
                 <a href="#" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-primary"><InstagramIcon className="w-7 h-7"/></a>
                 <a href="#" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-primary"><TiktokIcon className="w-7 h-7"/></a>
                 <a href="#" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-primary"><WhatsappIcon className="w-7 h-7"/></a>
-                <a href="mailto:contacto@restaurante.com" className="text-muted-foreground hover:text-primary"><Mail size={28}/></a>
+                <a href="mailto:contacto@restaurante.com" className="text-muted-foreground hover:text-primary"><EmailIcon className="w-7 h-7"/></a>
             </div>
         </section>
       </div>
