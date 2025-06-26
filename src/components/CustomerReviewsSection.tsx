@@ -5,7 +5,7 @@ import { useState, useRef } from 'react';
 import Autoplay from "embla-carousel-autoplay";
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
-import { Star, StarHalf } from 'lucide-react';
+import { Star } from 'lucide-react';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Button } from './ui/button';
 import { GoogleIcon } from './icons/GoogleIcon';
@@ -22,13 +22,24 @@ interface CustomerReviewsSectionProps {
 const GOOGLE_RATING = 4.8;
 const REVIEW_COUNT = 182;
 
+const HalfStarIcon = () => (
+  <div className="relative inline-block h-5 w-5">
+    {/* Background star (empty outline) */}
+    <Star className="h-5 w-5 text-yellow-500" />
+    {/* Foreground star (filled), clipped to 50% width */}
+    <div className="absolute top-0 left-0 h-full w-1/2 overflow-hidden">
+      <Star className="h-5 w-5 fill-yellow-500 text-yellow-500" />
+    </div>
+  </div>
+);
+
 const renderStars = (rating: number) => {
     const stars = [];
     for (let i = 1; i <= 5; i++) {
       if (i <= rating) {
         stars.push(<Star key={`star-full-${i}`} className="w-5 h-5 text-yellow-500 fill-yellow-500" />);
       } else if (i - 0.5 <= rating) {
-        stars.push(<StarHalf key={`star-half-${i}`} className="w-5 h-5 text-yellow-500 fill-yellow-500" />);
+        stars.push(<HalfStarIcon key={`star-half-${i}`} />);
       } else {
         stars.push(<Star key={`star-empty-${i}`} className="w-5 h-5 text-yellow-500" />);
       }
@@ -76,15 +87,15 @@ export function CustomerReviewsSection({ reviews }: CustomerReviewsSectionProps)
                         <CarouselContent>
                             {reviews.map((review, index) => (
                             <CarouselItem key={index}>
-                                <div className="p-1 text-center px-8">
-                                    <p className="text-muted-foreground italic mb-4 min-h-[5rem]">&quot;{review.text}&quot;</p>
+                                <div className="p-1 text-center min-h-[7rem] flex flex-col justify-center items-center px-4">
+                                    <p className="text-muted-foreground italic mb-4">&quot;{review.text}&quot;</p>
                                     <p className="font-semibold">{review.author}</p>
                                 </div>
                             </CarouselItem>
                             ))}
                         </CarouselContent>
-                        <CarouselPrevious className="absolute -left-4 lg:-left-8 top-1/2 -translate-y-1/2" />
-                        <CarouselNext className="absolute -right-4 lg:-right-8 top-1/2 -translate-y-1/2" />
+                        <CarouselPrevious className="absolute left-0 top-1/2 -translate-y-1/2" />
+                        <CarouselNext className="absolute right-0 top-1/2 -translate-y-1/2" />
                     </Carousel>
                 </CardContent>
             </Card>
