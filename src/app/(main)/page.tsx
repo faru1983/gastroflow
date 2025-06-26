@@ -5,9 +5,12 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { Footer } from '@/components/Footer';
-import { Star, Mail, Phone, MapPin, Facebook, Instagram } from 'lucide-react';
+import { Star, Mail, Phone, MapPin, BookOpenText, CalendarClock, Heart } from 'lucide-react';
 import { TiktokIcon } from '@/components/icons/TiktokIcon';
 import { WhatsappIcon } from '@/components/icons/WhatsappIcon';
+import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
+import { FacebookIcon } from '@/components/icons/FacebookIcon';
+import { InstagramIcon } from '@/components/icons/InstagramIcon';
 
 const MOCK_REVIEWS = `
 Review 1: The food was absolutely amazing, best pasta I've had in years! The service was a bit slow, but the atmosphere made up for it.
@@ -17,22 +20,25 @@ Review 4: Good food, but a little overpriced for the portion size. The location 
 Review 5: Loved the vibrant energy of this restaurant. The cocktails were creative and tasty. It's a popular spot, so make sure to book in advance.
 `;
 
-const MOCK_SUMMARY = "The food is amazing, with a fantastic atmosphere and friendly staff. The pasta and steak come highly recommended, and the desserts are a must-try!";
+const customerReviews = [
+    {
+        text: "La comida es increíble, con un ambiente fantástico y un personal amable. La pasta y el filete son muy recomendables, ¡y los postres son imprescindibles!",
+        author: "Ana P.",
+        rating: 5
+    },
+    {
+        text: "Un lugar fantástico para una cita nocturna. Ambiente acogedor y postres deliciosos. El tiramisú es algo que deben probar. Definitivamente volveremos.",
+        author: "Carlos G.",
+        rating: 5
+    },
+    {
+        text: "¡Gran experiencia! El personal fue increíblemente amable y atento. El bistec estaba cocinado a la perfección. Muy recomendable para cualquier ocasión.",
+        author: "Sofía L.",
+        rating: 4
+    }
+];
 
 export default async function HomePage() {
-  let summary = MOCK_SUMMARY;
-
-  if (process.env.GOOGLE_API_KEY || process.env.GEMINI_API_KEY) {
-    try {
-      const result = await summarizeReviews({ reviewText: MOCK_REVIEWS });
-      summary = result.summary;
-    } catch (error) {
-      console.error("Error fetching review summary:", error);
-      // Fallback to mock summary on error
-    }
-  } else {
-    console.log("AI functionality is disabled. Set GOOGLE_API_KEY or GEMINI_API_KEY to enable it.");
-  }
 
   return (
     <div className="w-full">
@@ -47,7 +53,7 @@ export default async function HomePage() {
         />
         <div className="absolute inset-0 flex flex-col items-center justify-center text-center text-white p-4 bg-black/30">
           <Image src="https://placehold.co/100x100.png" alt="Logotipo" width={100} height={100} className="rounded-full mb-4 border-2 border-white" data-ai-hint="restaurant logo" />
-          <h1 className="text-4xl md:text-5xl font-headline font-bold">Nombre del Restaurante</h1>
+          <h1 className="text-4xl md:text-5xl font-headline font-bold">GastroFlow</h1>
         </div>
       </header>
 
@@ -60,38 +66,61 @@ export default async function HomePage() {
 
         <section className="my-8">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <Link href="/menu" passHref><Button size="lg" className="w-full py-8 text-lg" variant="outline">Nuestra Carta</Button></Link>
-                <Link href="/reservations" passHref><Button size="lg" className="w-full py-8 text-lg">Reservar Mesa</Button></Link>
-                <Link href="/loyalty" passHref><Button size="lg" className="w-full py-8 text-lg" variant="secondary">Fidelización</Button></Link>
+                <Link href="/menu" passHref><Button size="lg" className="w-full py-8 text-lg"><BookOpenText/>Nuestra Carta</Button></Link>
+                <Link href="/reservations" passHref><Button size="lg" className="w-full py-8 text-lg"><CalendarClock/>Reservar Mesa</Button></Link>
+                <Link href="/loyalty" passHref><Button size="lg" className="w-full py-8 text-lg"><Heart/>Fidelización</Button></Link>
             </div>
         </section>
 
         <Separator className="my-8" />
         
-        <section className="grid md:grid-cols-2 gap-8 items-start">
-            <Card>
+        <section className="grid md:grid-cols-2 gap-8 items-stretch">
+            <Card className="h-full flex flex-col">
                 <CardHeader>
                     <CardTitle className="font-headline text-2xl">¿Qué dicen nuestros clientes?</CardTitle>
                 </CardHeader>
-                <CardContent>
-                    <p className="text-muted-foreground italic mb-4">&quot;{summary}&quot;</p>
-                    <a href="#" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 text-primary font-semibold hover:underline">
-                        <Star className="w-5 h-5 text-yellow-500 fill-yellow-500" />
-                        <span>Ver más y dejar una reseña en Google</span>
-                    </a>
+                <CardContent className="flex-grow flex items-center">
+                    <Carousel className="w-full" opts={{ loop: true }}>
+                      <CarouselContent>
+                        {customerReviews.map((review, index) => (
+                          <CarouselItem key={index}>
+                            <div className="p-1 text-center">
+                                <p className="text-muted-foreground italic mb-4">&quot;{review.text}&quot;</p>
+                                <div className="flex justify-center items-center gap-1 mb-2">
+                                    {Array.from({length: review.rating}).map((_, i) => <Star key={i} className="w-5 h-5 text-yellow-500 fill-yellow-500" />)}
+                                </div>
+                                <p className="font-semibold">{review.author}</p>
+                            </div>
+                          </CarouselItem>
+                        ))}
+                      </CarouselContent>
+                      <CarouselPrevious className="hidden sm:flex" />
+                      <CarouselNext className="hidden sm:flex" />
+                    </Carousel>
                 </CardContent>
             </Card>
 
-            <Card>
+            <Card className="h-full flex flex-col">
                 <CardHeader>
                     <CardTitle className="font-headline text-2xl">Información de Contacto</CardTitle>
                 </CardHeader>
-                <CardContent className="space-y-3">
-                    <p className="flex items-center gap-3"><MapPin className="w-5 h-5 text-primary"/> <span>Av. Ejemplo 123, Providencia, Santiago</span></p>
-                    <p className="flex items-center gap-3"><Phone className="w-5 h-5 text-primary"/> <span>+56 2 1234 5678</span></p>
-                    <p className="font-semibold mt-2">Horario:</p>
-                    <p className="text-muted-foreground ml-8">Lunes a Sábado: 12:00 - 23:00</p>
-                    <p className="text-muted-foreground ml-8">Domingo: 12:00 - 18:00</p>
+                <CardContent className="flex-grow flex flex-col justify-between">
+                    <div className="space-y-3">
+                        <p className="flex items-center gap-3"><MapPin className="w-5 h-5 text-primary"/> <span>Av. Ejemplo 123, Providencia, Santiago</span></p>
+                        <p className="flex items-center gap-3"><Phone className="w-5 h-5 text-primary"/> <span>+56 2 1234 5678</span></p>
+                        <p className="font-semibold mt-2">Horario:</p>
+                        <p className="text-muted-foreground ml-8">Lunes a Sábado: 12:00 - 23:00</p>
+                        <p className="text-muted-foreground ml-8">Domingo: 12:00 - 18:00</p>
+                    </div>
+                    <div className="mt-4">
+                        <iframe 
+                            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3329.589993322586!2d-70.6083204847953!3d-33.41165298077868!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x9662cf66a2c213e5%3A0x86743e435948332a!2sCostanera%20Center!5e0!3m2!1sen!2scl!4v1620926011198!5m2!1sen!2scl" 
+                            className="w-full h-48 border-0 rounded-md"
+                            allowFullScreen={false} 
+                            loading="lazy" 
+                            referrerPolicy="no-referrer-when-downgrade">
+                        </iframe>
+                    </div>
                 </CardContent>
             </Card>
         </section>
@@ -101,8 +130,8 @@ export default async function HomePage() {
         <section className="text-center">
             <h3 className="text-2xl font-headline mb-4">Síguenos</h3>
             <div className="flex justify-center items-center gap-6">
-                <a href="#" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-primary"><Facebook size={28}/></a>
-                <a href="#" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-primary"><Instagram size={28}/></a>
+                <a href="#" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-primary"><FacebookIcon className="w-7 h-7"/></a>
+                <a href="#" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-primary"><InstagramIcon className="w-7 h-7"/></a>
                 <a href="#" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-primary"><TiktokIcon className="w-7 h-7"/></a>
                 <a href="#" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-primary"><WhatsappIcon className="w-7 h-7"/></a>
                 <a href="mailto:contacto@restaurante.com" className="text-muted-foreground hover:text-primary"><Mail size={28}/></a>
