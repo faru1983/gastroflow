@@ -5,13 +5,13 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { Footer } from '@/components/Footer';
-import { Phone, MapPin, BookOpenText, CalendarClock, Heart, Star } from 'lucide-react';
+import { Phone, MapPin, BookOpenText, CalendarClock, Heart } from 'lucide-react';
 import { TiktokIcon } from '@/components/icons/TiktokIcon';
 import { WhatsappIcon } from '@/components/icons/WhatsappIcon';
-import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
 import { FacebookIcon } from '@/components/icons/FacebookIcon';
 import { InstagramIcon } from '@/components/icons/InstagramIcon';
 import { EmailIcon } from '@/components/icons/EmailIcon';
+import { CustomerReviewsSection } from '@/components/CustomerReviewsSection';
 
 const MOCK_REVIEWS = `
 Review 1: The food was absolutely amazing, best pasta I've had in years! The service was a bit slow, but the atmosphere made up for it.
@@ -83,30 +83,7 @@ export default async function HomePage() {
         <Separator className="my-8" />
         
         <section className="grid md:grid-cols-2 gap-8 items-stretch">
-            <Card className="h-full flex flex-col">
-                <CardHeader>
-                    <CardTitle className="font-headline text-2xl">¿Qué dicen nuestros clientes?</CardTitle>
-                </CardHeader>
-                <CardContent className="flex-grow flex items-center">
-                    <Carousel className="w-full" opts={{ loop: true }}>
-                      <CarouselContent>
-                        {customerReviews.map((review, index) => (
-                          <CarouselItem key={index}>
-                            <div className="p-1 text-center">
-                                <p className="text-muted-foreground italic mb-4">&quot;{review.text}&quot;</p>
-                                <div className="flex justify-center items-center gap-1 mb-2">
-                                    {Array.from({length: review.rating}).map((_, i) => <Star key={i} className="w-5 h-5 text-yellow-500 fill-yellow-500" />)}
-                                </div>
-                                <p className="font-semibold">{review.author}</p>
-                            </div>
-                          </CarouselItem>
-                        ))}
-                      </CarouselContent>
-                      <CarouselPrevious className="hidden sm:flex" />
-                      <CarouselNext className="hidden sm:flex" />
-                    </Carousel>
-                </CardContent>
-            </Card>
+            <CustomerReviewsSection reviews={customerReviews} />
 
             <Card className="h-full flex flex-col">
                 <CardHeader>
