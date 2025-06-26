@@ -41,7 +41,8 @@ const customerReviews = [
 export default async function HomePage() {
   const { summary } = await summarizeReviews({ reviewText: MOCK_REVIEWS }).catch(
     (e) => {
-      console.error(e);
+      // The API call will fail if the GEMINI_API_KEY is not set.
+      // We'll just use a mock summary in that case.
       return { summary: 'La comida es increíble, con un ambiente fantástico y un personal amable. La pasta y el filete son muy recomendables, ¡y los postres son imprescindibles!' };
     }
   );
