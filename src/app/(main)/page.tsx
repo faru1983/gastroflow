@@ -70,6 +70,9 @@ export default async function HomePage() {
           <p className="text-lg text-foreground/80">
             {summary}
           </p>
+          <p className="mt-2 text-lg text-foreground/80">
+             En GastroFlow, cada plato es una obra de arte, preparada con ingredientes frescos y una pasión que se siente en cada bocado. ¡Te esperamos!
+          </p>
         </section>
 
         <section className="my-8">

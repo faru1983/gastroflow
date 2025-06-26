@@ -8,6 +8,7 @@ import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious
 import { Star, StarHalf } from 'lucide-react';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Button } from './ui/button';
+import { GoogleIcon } from './icons/GoogleIcon';
 
 type Review = {
     text: string;
@@ -43,32 +44,30 @@ export function CustomerReviewsSection({ reviews }: CustomerReviewsSectionProps)
     );
 
     return (
-        <div className="flex flex-col space-y-8 h-full">
+        <div className="flex flex-col space-y-4 h-full">
             <Card>
-                <CardHeader>
-                    <CardTitle className="font-headline text-2xl">Calificación en Google</CardTitle>
-                </CardHeader>
-                <CardContent>
+                <CardContent className="p-4 flex items-center justify-center">
                      <div 
-                        className="text-center p-2 rounded-lg hover:bg-muted cursor-pointer"
+                        className="flex items-center justify-center gap-3 p-2 rounded-lg hover:bg-muted cursor-pointer"
                         onClick={() => setReviewModalOpen(true)}
                     >
-                        <div className="flex items-center justify-center gap-2 mt-1">
-                            <p className="text-2xl font-bold">{GOOGLE_RATING}</p>
-                            <div className="flex">
-                                {renderStars(GOOGLE_RATING)}
+                        <GoogleIcon className="w-7 h-7"/>
+                        <div className="flex flex-col">
+                            <div className="flex items-center gap-2">
+                                <p className="text-2xl font-bold">{GOOGLE_RATING}</p>
+                                <div className="flex">{renderStars(GOOGLE_RATING)}</div>
                             </div>
+                            <p className="text-xs text-muted-foreground -mt-1 underline">{REVIEW_COUNT} reseñas</p>
                         </div>
-                        <p className="text-sm text-muted-foreground mt-1 underline">{REVIEW_COUNT} reseñas</p>
                     </div>
                 </CardContent>
             </Card>
 
             <Card className="flex-grow flex flex-col">
-                <CardHeader>
+                <CardHeader className="pb-2">
                     <CardTitle className="font-headline text-2xl">¿Qué dicen nuestros clientes?</CardTitle>
                 </CardHeader>
-                <CardContent className="flex-grow flex items-center p-6">
+                <CardContent className="relative flex-grow flex items-center p-6 pt-2">
                     <Carousel 
                         className="w-full" 
                         opts={{ loop: true }}
@@ -79,7 +78,7 @@ export function CustomerReviewsSection({ reviews }: CustomerReviewsSectionProps)
                         <CarouselContent>
                             {reviews.map((review, index) => (
                             <CarouselItem key={index}>
-                                <div className="p-1 text-center">
+                                <div className="p-1 text-center px-8">
                                     <p className="text-muted-foreground italic mb-4 h-20">&quot;{review.text}&quot;</p>
                                     <div className="flex justify-center items-center gap-1 mb-2">
                                         {Array.from({length: review.rating}).map((_, i) => <Star key={i} className="w-5 h-5 text-yellow-500 fill-yellow-500" />)}
@@ -90,8 +89,8 @@ export function CustomerReviewsSection({ reviews }: CustomerReviewsSectionProps)
                             </CarouselItem>
                             ))}
                         </CarouselContent>
-                        <CarouselPrevious className="left-2" />
-                        <CarouselNext className="right-2" />
+                        <CarouselPrevious className="absolute left-2 top-1/2 -translate-y-1/2" />
+                        <CarouselNext className="absolute right-2 top-1/2 -translate-y-1/2" />
                     </Carousel>
                 </CardContent>
             </Card>
