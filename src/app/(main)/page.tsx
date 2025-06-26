@@ -39,6 +39,12 @@ const customerReviews = [
 ];
 
 export default async function HomePage() {
+  const { summary } = await summarizeReviews({ reviewText: MOCK_REVIEWS }).catch(
+    (e) => {
+      console.error(e);
+      return { summary: 'La comida es increíble, con un ambiente fantástico y un personal amable. La pasta y el filete son muy recomendables, ¡y los postres son imprescindibles!' };
+    }
+  );
 
   return (
     <div className="w-full">
@@ -60,7 +66,7 @@ export default async function HomePage() {
       <div className="container mx-auto px-4 py-8 max-w-4xl">
         <section className="text-center">
           <p className="text-lg text-foreground/80">
-            Una breve y atractiva descripción del restaurante, su concepto culinario y el ambiente que ofrece a sus comensales.
+            {summary}
           </p>
         </section>
 
@@ -104,7 +110,7 @@ export default async function HomePage() {
                 <CardHeader>
                     <CardTitle className="font-headline text-2xl">Información de Contacto</CardTitle>
                 </CardHeader>
-                <CardContent className="flex-grow flex flex-col justify-between">
+                <CardContent className="flex-grow flex flex-col justify-center">
                     <div className="space-y-3">
                         <p className="flex items-center gap-3"><MapPin className="w-5 h-5 text-primary"/> <span>Av. Ejemplo 123, Providencia, Santiago</span></p>
                         <p className="flex items-center gap-3"><Phone className="w-5 h-5 text-primary"/> <span>+56 2 1234 5678</span></p>
@@ -112,17 +118,23 @@ export default async function HomePage() {
                         <p className="text-muted-foreground ml-8">Lunes a Sábado: 12:00 - 23:00</p>
                         <p className="text-muted-foreground ml-8">Domingo: 12:00 - 18:00</p>
                     </div>
-                    <div className="mt-4">
-                        <iframe 
-                            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3329.589993322586!2d-70.6083204847953!3d-33.41165298077868!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x9662cf66a2c213e5%3A0x86743e435948332a!2sCostanera%20Center!5e0!3m2!1sen!2scl!4v1620926011198!5m2!1sen!2scl" 
-                            className="w-full h-48 border-0 rounded-md"
-                            allowFullScreen={false} 
-                            loading="lazy" 
-                            referrerPolicy="no-referrer-when-downgrade">
-                        </iframe>
-                    </div>
                 </CardContent>
             </Card>
+        </section>
+
+        <Separator className="my-8" />
+
+        <section>
+          <h3 className="text-2xl font-headline mb-4 text-center">Encuéntranos</h3>
+          <div className="mt-4">
+              <iframe 
+                  src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3329.589993322586!2d-70.6083204847953!3d-33.41165298077868!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x9662cf66a2c213e5%3A0x86743e435948332a!2sCostanera%20Center!5e0!3m2!1sen!2scl!4v1620926011198!5m2!1sen!2scl" 
+                  className="w-full h-64 border-0 rounded-md"
+                  allowFullScreen={false} 
+                  loading="lazy" 
+                  referrerPolicy="no-referrer-when-downgrade">
+              </iframe>
+          </div>
         </section>
 
         <Separator className="my-8" />
