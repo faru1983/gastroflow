@@ -5,6 +5,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Calendar } from '@/components/ui/calendar';
@@ -16,7 +17,7 @@ import { CalendarIcon, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { Switch } from '@/components/ui/switch';
 
 const reservationSchema = z.object({
@@ -82,8 +83,8 @@ export default function ReservationsPage() {
     mode: 'onChange',
   });
 
-  const prefillForm = () => {
-    if (isAuthenticated && user) {
+  const prefillForm = useCallback(() => {
+    if (user) {
         const [year, month, day] = user.fechaNacimiento?.split('-') || ['', '', ''];
         form.reset({
             ...form.getValues(),
@@ -99,13 +100,13 @@ export default function ReservationsPage() {
             promociones: user.promociones || false,
         });
     }
-  }
+  }, [user, form]);
 
   useEffect(() => {
     if (isAuthenticated && user) {
         prefillForm();
     }
-  }, [isAuthenticated, user]);
+  }, [isAuthenticated, user, prefillForm]);
 
 
   const handleLoadData = () => {
@@ -242,7 +243,7 @@ export default function ReservationsPage() {
                 </div>
                  <div className="grid md:grid-cols-2 gap-4">
                      <FormField control={form.control} name="nombre" render={({ field }) => (<FormItem><FormControl><Input placeholder="Nombre" {...field} /></FormControl><FormMessage /></FormItem>)} />
-                     <FormField control={form.control} name="apellidos" render={({ field }) => (<FormItem><FormControl><Input placeholder="Apellidos" {...field} /></FormControl><FormMessage /></FormItem>)} />
+                     <FormField control={form.control} name="apellidos" render={({ field }) => (<FormItem><FormControl><Input placeholder="Apellidos" {...field} /></FormControl><FormMessage /></FormMessage>)} />
                  </div>
                  <div className="grid md:grid-cols-2 gap-4">
                     <FormField control={form.control} name="email" render={({ field }) => (<FormItem><FormControl><Input type="email" placeholder="Email" {...field} /></FormControl><FormMessage /></FormItem>)} />
