@@ -22,10 +22,10 @@ import { Switch } from '@/components/ui/switch';
 
 const reservationSchema = z.object({
   date: z.date({ required_error: 'La fecha es requerida.' }),
-  time: z.string({ required_error: 'La hora es requerida.' }),
-  people: z.coerce.number({ required_error: "La cantidad de personas es requerida."}).min(1, "Debe seleccionar al menos 1 persona.").max(8, "Máximo 8 personas."),
-  preference: z.string({ required_error: 'La preferencia es requerida.' }),
-  reason: z.string({ required_error: 'El motivo es requerido.' }),
+  time: z.string().min(1, 'La hora es requerida.'),
+  people: z.coerce.number().min(1, "Debe seleccionar al menos 1 persona.").max(8, "Máximo 8 personas."),
+  preference: z.string().min(1, 'La preferencia es requerida.'),
+  reason: z.string().min(1, 'El motivo es requerido.'),
   comments: z.string().optional(),
   nombre: z.string().min(1, 'Nombre es requerido.'),
   apellidos: z.string().min(1, 'Apellidos son requeridos.'),
@@ -70,12 +70,19 @@ export default function ReservationsPage() {
   const form = useForm<z.infer<typeof reservationSchema>>({
     resolver: zodResolver(reservationSchema),
     defaultValues: {
+      date: undefined,
+      time: undefined,
       people: undefined,
+      preference: undefined,
+      reason: undefined,
       comments: '',
       nombre: '',
       apellidos: '',
       email: '',
-      celular: '',
+      celular: '+569-',
+      day: undefined,
+      month: undefined,
+      year: undefined,
       comuna: '',
       instagram: '',
       promociones: true,
@@ -85,16 +92,16 @@ export default function ReservationsPage() {
 
   const prefillForm = useCallback(() => {
     if (user) {
-        const [year, month, day] = user.fechaNacimiento?.split('-') || ['', '', ''];
+        const [year, month, day] = user.fechaNacimiento?.split('-') || [];
         form.reset({
             ...form.getValues(),
             nombre: user.nombre || '',
             apellidos: user.apellidos || '',
             email: user.email || '',
-            celular: user.celular || '',
-            day: day || '',
-            month: month || '',
-            year: year || '',
+            celular: user.celular || '+569-',
+            day: day || undefined,
+            month: month || undefined,
+            year: year || undefined,
             comuna: user.comuna || '',
             instagram: user.instagram || '',
             promociones: user.promociones,
@@ -122,18 +129,23 @@ export default function ReservationsPage() {
   
   const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>, fieldOnChange: (...event: any[]) => void) => {
     let value = e.target.value;
-    let cleaned = value.startsWith('+') ? '+' + value.substring(1).replace(/\D/g, '') : value.replace(/\D/g, '');
-    
-    if (cleaned.length > 12) { // e.g. +56912345678 -> 12 chars
-        cleaned = cleaned.substring(0, 12);
-    }
 
-    let formattedValue = cleaned;
-    if (cleaned.length > 4) { // Add dash after country code
-        formattedValue = `${cleaned.substring(0, 4)}-${cleaned.substring(4)}`;
+    let numericValue = value.replace(/\D/g, '');
+    if (value.startsWith('+')) {
+        numericValue = value.substring(1).replace(/\D/g, '');
     }
     
-    fieldOnChange(formattedValue);
+    if (numericValue.length > 11) {
+        numericValue = numericValue.substring(0, 11);
+    }
+    
+    let formatted = '+' + numericValue;
+
+    if (numericValue.length > 3) {
+        formatted = `+${numericValue.substring(0, 3)}-${numericValue.substring(3)}`;
+    }
+    
+    fieldOnChange(formatted);
   };
 
   function onSubmit(data: z.infer<typeof reservationSchema>) {
@@ -195,7 +207,7 @@ export default function ReservationsPage() {
                 <div className="grid md:grid-cols-2 gap-4">
                     <FormField control={form.control} name="people" render={({ field }) => (
                         <FormItem>
-                             <Select onValueChange={(val) => field.onChange(Number(val))} value={field.value ? String(field.value) : ""}>
+                             <Select onValueChange={(val) => field.onChange(Number(val))} value={field.value ? String(field.value) : undefined}>
                                 <FormControl><SelectTrigger><SelectValue placeholder="Cantidad personas" /></SelectTrigger></FormControl>
                                 <SelectContent>{Array.from({ length: 8 }, (_, i) => i + 1).map(p => <SelectItem key={p} value={String(p)}>{p} persona{p>1 && 's'}</SelectItem>)}</SelectContent>
                             </Select>

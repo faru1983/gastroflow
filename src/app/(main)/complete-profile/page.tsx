@@ -52,12 +52,12 @@ export default function CompleteProfilePage() {
     defaultValues: {
       nombre: user?.nombre || '',
       apellidos: user?.apellidos || '',
-      day: user?.fechaNacimiento?.split('-')[2] || '',
-      month: user?.fechaNacimiento?.split('-')[1] || '',
-      year: user?.fechaNacimiento?.split('-')[0] || '',
+      day: user?.fechaNacimiento?.split('-')[2] || undefined,
+      month: user?.fechaNacimiento?.split('-')[1] || undefined,
+      year: user?.fechaNacimiento?.split('-')[0] || undefined,
       comuna: user?.comuna || '',
       instagram: user?.instagram || '',
-      celular: user?.celular || '',
+      celular: user?.celular || '+569-',
     },
     mode: 'onChange',
   });
@@ -70,34 +70,39 @@ export default function CompleteProfilePage() {
 
   useEffect(() => {
     if (user) {
-        const [year, month, day] = user.fechaNacimiento?.split('-') || ['', '', ''];
+        const [year, month, day] = user.fechaNacimiento?.split('-') || [];
         form.reset({
             nombre: user.nombre || '',
             apellidos: user.apellidos || '',
-            day: day || '',
-            month: month || '',
-            year: year || '',
+            day: day || undefined,
+            month: month || undefined,
+            year: year || undefined,
             comuna: user.comuna || '',
             instagram: user.instagram || '',
-            celular: user.celular || '',
+            celular: user.celular || '+569-',
         });
     }
   }, [user, form]);
 
   const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>, fieldOnChange: (...event: any[]) => void) => {
     let value = e.target.value;
-    let cleaned = value.startsWith('+') ? '+' + value.substring(1).replace(/\D/g, '') : value.replace(/\D/g, '');
-    
-    if (cleaned.length > 12) { // e.g. +56912345678 -> 12 chars
-        cleaned = cleaned.substring(0, 12);
-    }
 
-    let formattedValue = cleaned;
-    if (cleaned.length > 4) { // Add dash after country code
-        formattedValue = `${cleaned.substring(0, 4)}-${cleaned.substring(4)}`;
+    let numericValue = value.replace(/\D/g, '');
+    if (value.startsWith('+')) {
+        numericValue = value.substring(1).replace(/\D/g, '');
     }
     
-    fieldOnChange(formattedValue);
+    if (numericValue.length > 11) {
+        numericValue = numericValue.substring(0, 11);
+    }
+    
+    let formatted = '+' + numericValue;
+
+    if (numericValue.length > 3) {
+        formatted = `+${numericValue.substring(0, 3)}-${numericValue.substring(3)}`;
+    }
+    
+    fieldOnChange(formatted);
   };
 
 
