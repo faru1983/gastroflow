@@ -58,6 +58,9 @@ function LoggedInView() {
         email: user?.email || '',
         celular: user?.celular || '',
         promociones: user?.promociones || false,
+        currentPassword: '',
+        newPassword: '',
+        confirmNewPassword: '',
     });
 
     useEffect(() => {
@@ -74,6 +77,9 @@ function LoggedInView() {
                 email: user.email || '',
                 celular: user.celular || '',
                 promociones: user.promociones || false,
+                currentPassword: '',
+                newPassword: '',
+                confirmNewPassword: '',
             });
         }
     }, [user, isEditing]);
@@ -87,11 +93,23 @@ function LoggedInView() {
     };
 
     const handleUpdate = () => {
-        const { day, month, year, ...rest } = formData;
+        const { day, month, year, currentPassword, newPassword, confirmNewPassword, ...rest } = formData;
+        
+        if (newPassword || currentPassword) {
+            if (newPassword !== confirmNewPassword) {
+                toast({ variant: "destructive", title: "Error", description: "Las nuevas contraseñas no coinciden." });
+                return;
+            }
+            if (newPassword && !currentPassword) {
+                toast({ variant: "destructive", title: "Error", description: "Debes ingresar tu contraseña actual para cambiarla." });
+                return;
+            }
+        }
+        
         const fechaNacimiento = (year && month && day) ? `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}` : undefined;
         updateUser({ ...rest, fechaNacimiento });
         setIsEditing(false);
-        toast({ title: "Datos actualizados", description: "Tu información ha sido guardada." });
+        toast({ title: "¡Éxito!", description: "Tu información ha sido actualizada correctamente." });
     }
 
     if (!user) return null;
@@ -143,12 +161,28 @@ function LoggedInView() {
 
                     {isEditing && (
                         <>
-                            <Separator className="my-6"/>
+                            <Separator />
                             <div className="space-y-4">
+                                <h3 className="text-lg font-semibold -mb-2">Cambiar Contraseña</h3>
+                                <Input name="currentPassword" type="password" placeholder="Contraseña Actual" value={formData.currentPassword} onChange={handleInputChange} />
+                                <Input name="newPassword" type="password" placeholder="Nueva Contraseña" value={formData.newPassword} onChange={handleInputChange} />
+                                <Input name="confirmNewPassword" type="password" placeholder="Confirmar Nueva Contraseña" value={formData.confirmNewPassword} onChange={handleInputChange} />
+                            </div>
+
+                            <Separator />
+
+                            <div className="space-y-4">
+                                <h3 className="text-lg font-semibold -mb-2">Preferencias</h3>
                                 <div className="flex items-center space-x-2">
                                     <Switch id="promociones" checked={formData.promociones} onCheckedChange={(checked) => setFormData({...formData, promociones: checked})} />
                                     <Label htmlFor="promociones">Suscribirse a mensajes promocionales</Label>
                                 </div>
+                            </div>
+                            
+                            <Separator/>
+
+                             <div className="space-y-4 pt-4">
+                                 <h3 className="text-lg font-semibold text-destructive">Zona de Peligro</h3>
                                  <AlertDialog>
                                     <AlertDialogTrigger asChild>
                                         <Button variant="destructive">Eliminar Cuenta</Button>
@@ -167,6 +201,7 @@ function LoggedInView() {
                                         </AlertDialogFooter>
                                     </AlertDialogContent>
                                 </AlertDialog>
+                                <p className="text-sm text-muted-foreground">Esta acción es permanente y eliminará todos tus datos, visitas y beneficios asociados.</p>
                             </div>
                         </>
                     )}
@@ -174,11 +209,11 @@ function LoggedInView() {
                 <CardFooter>
                     {isEditing ? (
                         <div className="flex gap-2">
-                            <Button onClick={handleUpdate}>Guardar Cambios</Button>
-                            <Button variant="ghost" onClick={() => setIsEditing(false)}>Cancelar</Button>
+                            <Button onClick={handleUpdate} className="bg-green-600 hover:bg-green-700 text-primary-foreground">Guardar Cambios</Button>
+                            <Button variant="ghost" onClick={() => { setIsEditing(false); setDeleteConfirmText(""); }}>Cancelar</Button>
                         </div>
                     ) : (
-                        <Button onClick={() => setIsEditing(true)}>Actualizar Datos</Button>
+                        <Button onClick={() => setIsEditing(true)} className="bg-green-600 hover:bg-green-700 text-primary-foreground">Actualizar Datos</Button>
                     )}
                 </CardFooter>
             </Card>
