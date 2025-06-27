@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState } from 'react';
@@ -10,6 +11,7 @@ import { mockVisits, activeBenefits, usedBenefits } from '@/lib/data';
 import { Input } from '@/components/ui/input';
 import Image from 'next/image';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 function LoggedOutView() {
     const { showAuthModal } = useAuth();
@@ -84,62 +86,78 @@ function LoggedInView() {
                 </CardContent>
             </Card>
 
-            <section>
-                <h2 className="text-2xl font-headline mb-4">Beneficios Vigentes</h2>
-                {activeBenefits.length > 0 ? (
-                    <div className="space-y-4">
-                        {activeBenefits.map(benefit => (
-                            <Card key={benefit.id} className="bg-secondary">
-                                <CardHeader>
-                                    <CardTitle>{benefit.name}</CardTitle>
-                                    <CardDescription>{benefit.description}</CardDescription>
-                                </CardHeader>
-                                <CardFooter>
-                                    <Button onClick={() => setSelectedBenefitQr(benefit.qrCode)} className="w-full bg-green-600 hover:bg-green-700">Usar Beneficio</Button>
-                                </CardFooter>
-                            </Card>
-                        ))}
+            <Tabs defaultValue="disponibles" className="w-full">
+                <TabsList className="grid w-full grid-cols-3">
+                    <TabsTrigger value="disponibles">Disponibles</TabsTrigger>
+                    <TabsTrigger value="usados">Usados</TabsTrigger>
+                    <TabsTrigger value="visitas">Visitas</TabsTrigger>
+                </TabsList>
+                <TabsContent value="disponibles">
+                    <div className="mt-4">
+                        {activeBenefits.length > 0 ? (
+                            <div className="space-y-4">
+                                {activeBenefits.map(benefit => (
+                                    <Card key={benefit.id} className="bg-secondary">
+                                        <CardHeader>
+                                            <CardTitle>{benefit.name}</CardTitle>
+                                            <CardDescription>{benefit.description}</CardDescription>
+                                        </CardHeader>
+                                        <CardFooter>
+                                            <Button onClick={() => setSelectedBenefitQr(benefit.qrCode)} className="w-full bg-green-600 hover:bg-green-700">Usar Beneficio</Button>
+                                        </CardFooter>
+                                    </Card>
+                                ))}
+                            </div>
+                        ): (
+                            <div className="text-center text-muted-foreground py-12">
+                                <p>Aún no tienes beneficios disponibles. ¡Sigue registrando tus visitas!</p>
+                            </div>
+                        )}
                     </div>
-                ): (
-                    <p className="text-muted-foreground">Aún no tienes beneficios disponibles. ¡Sigue registrando tus visitas!</p>
-                )}
-            </section>
-
-             <section>
-                <h2 className="text-2xl font-headline mb-4">Beneficios Expirados o Utilizados</h2>
-                 {usedBenefits.length > 0 ? (
-                    <div className="space-y-4">
-                        {usedBenefits.map(benefit => (
-                           <Card key={benefit.id} className="opacity-60">
-                                <CardHeader>
-                                    <CardTitle>{benefit.name}</CardTitle>
-                                    <CardDescription>{benefit.description}</CardDescription>
-                                </CardHeader>
-                            </Card>
-                        ))}
+                </TabsContent>
+                <TabsContent value="usados">
+                    <div className="mt-4">
+                        {usedBenefits.length > 0 ? (
+                            <div className="space-y-4">
+                                {usedBenefits.map(benefit => (
+                                <Card key={benefit.id} className="opacity-60">
+                                        <CardHeader>
+                                            <CardTitle>{benefit.name}</CardTitle>
+                                            <CardDescription>{benefit.description}</CardDescription>
+                                        </CardHeader>
+                                    </Card>
+                                ))}
+                            </div>
+                        ) : (
+                            <div className="text-center text-muted-foreground py-12">
+                                <p>No tienes beneficios en esta categoría.</p>
+                            </div>
+                        )}
                     </div>
-                 ) : (
-                    <p className="text-muted-foreground">No tienes beneficios en esta categoría.</p>
-                 )}
-            </section>
-
-            <section>
-                <h2 className="text-2xl font-headline mb-4">Historial de Visitas</h2>
-                <Card>
-                    <CardContent className="p-0">
-                        <ul className="divide-y">
-                            {mockVisits.map(visit => (
-                                <li key={visit.id} className="p-4 flex justify-between items-center">
-                                    <div>
-                                        <p className="font-semibold">{visit.reason}</p>
-                                        <p className="text-sm text-muted-foreground">{visit.date.toLocaleDateString('es-CL', { year: 'numeric', month: 'long', day: 'numeric' })} - {visit.date.toLocaleTimeString('es-CL', { hour: '2-digit', minute: '2-digit' })}</p>
-                                    </div>
-                                </li>
-                            ))}
-                        </ul>
-                    </CardContent>
-                </Card>
-            </section>
+                </TabsContent>
+                <TabsContent value="visitas">
+                    <Card className="mt-4">
+                        <CardContent className="p-0">
+                            {mockVisits.length > 0 ? (
+                                <ul className="divide-y">
+                                    {mockVisits.map(visit => (
+                                        <li key={visit.id} className="p-4 flex justify-between items-center">
+                                            <div>
+                                                <p className="font-semibold">{visit.reason}</p>
+                                                <p className="text-sm text-muted-foreground">{visit.date.toLocaleDateString('es-CL', { year: 'numeric', month: 'long', day: 'numeric' })} - {visit.date.toLocaleTimeString('es-CL', { hour: '2-digit', minute: '2-digit' })}</p>
+                                            </div>
+                                        </li>
+                                    ))}
+                                </ul>
+                            ) : (
+                                <div className="text-center text-muted-foreground py-12">
+                                    <p>No has registrado ninguna visita todavía.</p>
+                                </div>
+                            )}
+                        </CardContent>
+                    </Card>
+                </TabsContent>
+            </Tabs>
             
             {selectedBenefitQr && (
                 <Dialog open={!!selectedBenefitQr} onOpenChange={() => setSelectedBenefitQr(null)}>
