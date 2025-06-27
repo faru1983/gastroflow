@@ -4,7 +4,7 @@ import { Toaster } from '@/components/ui/toaster';
 import { AuthProvider } from '@/contexts/auth-context';
 
 export const metadata: Metadata = {
-  title: 'GastroHub',
+  title: 'GastroFlow',
   description: 'La experiencia digital para tu restaurante.',
 };
 

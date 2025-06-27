@@ -87,6 +87,22 @@ function LoggedInView() {
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
     };
+    
+    const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        let value = e.target.value;
+        let cleaned = value.startsWith('+') ? '+' + value.substring(1).replace(/\D/g, '') : value.replace(/\D/g, '');
+        
+        if (cleaned.length > 12) { // e.g. +56912345678 -> 12 chars
+            cleaned = cleaned.substring(0, 12);
+        }
+
+        let formattedValue = cleaned;
+        if (cleaned.length > 4) { // Add dash after country code
+            formattedValue = `${cleaned.substring(0, 4)}-${cleaned.substring(4)}`;
+        }
+        
+        setFormData({ ...formData, celular: formattedValue });
+    };
 
     const handleSelectChange = (name: string, value: string) => {
         setFormData({ ...formData, [name]: value });
@@ -133,7 +149,7 @@ function LoggedInView() {
                     </div>
                     
                     <div className="space-y-2">
-                        <p className="text-sm font-medium text-muted-foreground">Fecha de Nacimiento</p>
+                        <Label>Fecha de Nacimiento</Label>
                         <div className="grid grid-cols-3 gap-4">
                              <Select onValueChange={(value) => handleSelectChange('day', value)} value={formData.day} disabled={!isEditing}>
                                 <SelectTrigger><SelectValue placeholder="Día" /></SelectTrigger>
@@ -153,7 +169,7 @@ function LoggedInView() {
                     <Input name="comuna" placeholder="Comuna (Ej: Las Condes)" value={formData.comuna} onChange={handleInputChange} disabled={!isEditing} />
                     
                     <div className="grid md:grid-cols-2 gap-4">
-                        <Input name="celular" placeholder="Celular (Ej: +569...)" value={formData.celular} onChange={handleInputChange} disabled={!isEditing} />
+                        <Input name="celular" placeholder="Celular (Ej: +569-xxxxxxxx)" value={formData.celular} onChange={handlePhoneChange} disabled={!isEditing} />
                         <Input name="instagram" placeholder="Instagram (opcional)" value={formData.instagram} onChange={handleInputChange} disabled={!isEditing} />
                     </div>
                     

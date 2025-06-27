@@ -84,6 +84,22 @@ export default function CompleteProfilePage() {
     }
   }, [user, form]);
 
+  const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>, fieldOnChange: (...event: any[]) => void) => {
+    let value = e.target.value;
+    let cleaned = value.startsWith('+') ? '+' + value.substring(1).replace(/\D/g, '') : value.replace(/\D/g, '');
+    
+    if (cleaned.length > 12) { // e.g. +56912345678 -> 12 chars
+        cleaned = cleaned.substring(0, 12);
+    }
+
+    let formattedValue = cleaned;
+    if (cleaned.length > 4) { // Add dash after country code
+        formattedValue = `${cleaned.substring(0, 4)}-${cleaned.substring(4)}`;
+    }
+    
+    fieldOnChange(formattedValue);
+  };
+
 
   function onSubmit(data: z.infer<typeof completeProfileSchema>) {
     setIsLoading(true);
@@ -154,7 +170,14 @@ export default function CompleteProfilePage() {
                     </div>
                     <FormField control={form.control} name="comuna" render={({ field }) => (<FormItem><FormControl><Input placeholder="Comuna (Ej: Las Condes)" {...field} /></FormControl><FormMessage /></FormItem>)} />
                     <div className="grid md:grid-cols-2 gap-4">
-                        <FormField control={form.control} name="celular" render={({ field }) => (<FormItem><FormControl><Input placeholder="Celular (Ej: +569...)" {...field} /></FormControl><FormMessage /></FormItem>)} />
+                        <FormField control={form.control} name="celular" render={({ field }) => (
+                            <FormItem>
+                                <FormControl>
+                                    <Input placeholder="+569-xxxxxxxx" {...field} onChange={(e) => handlePhoneChange(e, field.onChange)} />
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )} />
                         <FormField control={form.control} name="instagram" render={({ field }) => (<FormItem><FormControl><Input placeholder="Instagram (opcional)" {...field} /></FormControl><FormMessage /></FormItem>)} />
                     </div>
                     <Button type="submit" className="w-full bg-accent text-accent-foreground hover:bg-accent/90" disabled={isLoading || !form.formState.isValid}>

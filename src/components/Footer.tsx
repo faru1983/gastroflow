@@ -4,12 +4,12 @@ export function Footer() {
       <p className="text-sm text-muted-foreground">
         Sitio potenciado por{' '}
         <a
-          href="https://gastrohub.app"
+          href="https://gastroflow.app"
           target="_blank"
           rel="noopener noreferrer"
           className="font-semibold text-primary hover:underline"
         >
-          GastroHub App
+          GastroFlow App
         </a>
       </p>
     </footer>
