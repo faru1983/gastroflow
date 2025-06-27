@@ -5,7 +5,6 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Calendar } from '@/components/ui/calendar';
@@ -60,6 +59,24 @@ const years = Array.from({ length: 100 }, (_, i) => currentYear - i);
 const months = Array.from({ length: 12 }, (_, i) => ({ value: (i + 1).toString(), label: new Date(2000, i, 1).toLocaleString('es-CL', { month: 'long' }) }));
 const days = Array.from({ length: 31 }, (_, i) => (i + 1).toString());
 
+const defaultValues = {
+  date: undefined,
+  time: undefined,
+  people: undefined,
+  preference: undefined,
+  reason: undefined,
+  comments: '',
+  nombre: '',
+  apellidos: '',
+  email: '',
+  celular: '+569-',
+  day: undefined,
+  month: undefined,
+  year: undefined,
+  comuna: '',
+  instagram: '',
+  promociones: true,
+};
 
 export default function ReservationsPage() {
   const { toast } = useToast();
@@ -69,24 +86,7 @@ export default function ReservationsPage() {
 
   const form = useForm<z.infer<typeof reservationSchema>>({
     resolver: zodResolver(reservationSchema),
-    defaultValues: {
-      date: undefined,
-      time: undefined,
-      people: undefined,
-      preference: undefined,
-      reason: undefined,
-      comments: '',
-      nombre: '',
-      apellidos: '',
-      email: '',
-      celular: '+569-',
-      day: undefined,
-      month: undefined,
-      year: undefined,
-      comuna: '',
-      instagram: '',
-      promociones: true,
-    },
+    defaultValues: defaultValues,
     mode: 'onChange',
   });
 
@@ -104,7 +104,7 @@ export default function ReservationsPage() {
             year: year || undefined,
             comuna: user.comuna || '',
             instagram: user.instagram || '',
-            promociones: user.promociones,
+            promociones: user.promociones ?? true,
         });
     }
   }, [user, form]);
@@ -130,10 +130,17 @@ export default function ReservationsPage() {
   const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>, fieldOnChange: (...event: any[]) => void) => {
     let value = e.target.value;
 
-    let numericValue = value.replace(/\D/g, '');
-    if (value.startsWith('+')) {
-        numericValue = value.substring(1).replace(/\D/g, '');
+    if (!value.startsWith('+')) {
+      value = '+' + value.replace(/\D/g, '');
+    } else {
+      value = '+' + value.substring(1).replace(/\D/g, '');
     }
+    
+    if (value === '+') {
+      value = '+569-';
+    }
+
+    let numericValue = value.substring(1).replace(/\D/g, '');
     
     if (numericValue.length > 11) {
         numericValue = numericValue.substring(0, 11);
@@ -156,10 +163,23 @@ export default function ReservationsPage() {
             title: '¡Reserva Confirmada!',
             description: `Gracias ${data.nombre}, tu mesa para ${data.people} ha sido reservada para el ${format(data.date, 'PPP', { locale: es })} a las ${data.time}.`,
         });
-        form.reset();
+
+        const resetValues = { ...defaultValues };
         if (isAuthenticated && user) {
-          prefillForm();
+            const [year, month, day] = user.fechaNacimiento?.split('-') || [];
+            resetValues.nombre = user.nombre || '';
+            resetValues.apellidos = user.apellidos || '';
+            resetValues.email = user.email || '';
+            resetValues.celular = user.celular || '+569-';
+            resetValues.day = day || undefined;
+            resetValues.month = month || undefined;
+            resetValues.year = year || undefined;
+            resetValues.comuna = user.comuna || '';
+            resetValues.instagram = user.instagram || '';
+            resetValues.promociones = user.promociones ?? true;
         }
+        form.reset(resetValues);
+
         setIsLoading(false);
     }, 1500);
   }
@@ -270,7 +290,7 @@ export default function ReservationsPage() {
                     )} />
                 </div>
                  <div className="space-y-2">
-                    <Label>Fecha de Nacimiento</Label>
+                    <p className="text-sm font-medium text-muted-foreground">Fecha de Nacimiento</p>
                     <div className="grid grid-cols-3 gap-4">
                         <FormField control={form.control} name="day" render={({ field }) => (
                             <FormItem>
