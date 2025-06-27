@@ -52,6 +52,7 @@ export default function ReservationsPage() {
       email: '',
       celular: '',
     },
+    mode: 'onChange',
   });
 
   const prefillForm = () => {
@@ -199,7 +200,7 @@ export default function ReservationsPage() {
                 </div>
             </div>
 
-            <Button type="submit" className="w-full text-lg py-6" disabled={isLoading}>
+            <Button type="submit" className="w-full text-lg py-6 bg-accent text-accent-foreground hover:bg-accent/90" disabled={isLoading || !form.formState.isValid}>
               {isLoading ? <Loader2 className="animate-spin" /> : 'Reservar'}
             </Button>
         </form>

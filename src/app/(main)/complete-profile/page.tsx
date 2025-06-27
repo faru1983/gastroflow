@@ -38,6 +38,7 @@ export default function CompleteProfilePage() {
       instagram: user?.instagram || '',
       celular: user?.celular || '',
     },
+    mode: 'onChange',
   });
   
   useEffect(() => {
@@ -99,7 +100,7 @@ export default function CompleteProfilePage() {
                         <FormField control={form.control} name="celular" render={({ field }) => (<FormItem><FormLabel>Celular</FormLabel><FormControl><Input placeholder="+569..." {...field} /></FormControl><FormMessage /></FormItem>)} />
                         <FormField control={form.control} name="instagram" render={({ field }) => (<FormItem><FormLabel>Instagram (opcional)</FormLabel><FormControl><Input placeholder="@usuario" {...field} /></FormControl><FormMessage /></FormItem>)} />
                     </div>
-                    <Button type="submit" className="w-full" disabled={isLoading}>
+                    <Button type="submit" className="w-full bg-accent text-accent-foreground hover:bg-accent/90" disabled={isLoading || !form.formState.isValid}>
                         {isLoading ? <Loader2 className="animate-spin" /> : 'Guardar y continuar'}
                     </Button>
                 </form>

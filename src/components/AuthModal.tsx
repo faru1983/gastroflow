@@ -50,6 +50,7 @@ export function AuthModal() {
   const loginForm = useForm<z.infer<typeof loginSchema>>({
     resolver: zodResolver(loginSchema),
     defaultValues: { email: '', password: '' },
+    mode: 'onChange',
   });
 
   const registerForm = useForm<z.infer<typeof registerSchema>>({
@@ -59,6 +60,7 @@ export function AuthModal() {
       password: '',
       promociones: false,
     },
+    mode: 'onChange',
   });
 
   const onLoginSubmit = async (values: z.infer<typeof loginSchema>) => {
@@ -93,7 +95,7 @@ export function AuthModal() {
     <Dialog open={isAuthModalOpen} onOpenChange={closeAuthModal}>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle className="text-center text-2xl font-headline">GastroHub</DialogTitle>
+          <DialogTitle className="text-center text-2xl font-headline">GastroFlow</DialogTitle>
           <DialogDescription className="text-center">
             Accede a tu cuenta para disfrutar de todos los beneficios.
           </DialogDescription>
@@ -130,7 +132,7 @@ export function AuthModal() {
                     </FormItem>
                   )}
                 />
-                <Button type="submit" className="w-full bg-accent hover:bg-accent/90" disabled={isLoading}>
+                <Button type="submit" className="w-full bg-accent text-accent-foreground hover:bg-accent/90" disabled={isLoading || !loginForm.formState.isValid}>
                    {isLoading ? <Loader2 className="animate-spin" /> : 'Entrar'}
                 </Button>
                  <Button variant="link" size="sm" className="w-full">Olvidé mi contraseña</Button>
@@ -162,7 +164,7 @@ export function AuthModal() {
                     </FormItem>
                   )}
                 />
-                <Button type="submit" className="w-full bg-accent hover:bg-accent/90" disabled={isLoading}>
+                <Button type="submit" className="w-full bg-accent text-accent-foreground hover:bg-accent/90" disabled={isLoading || !registerForm.formState.isValid}>
                   {isLoading ? <Loader2 className="animate-spin" /> : 'Continuar'}
                 </Button>
               </form>
