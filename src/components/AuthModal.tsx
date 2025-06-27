@@ -66,8 +66,8 @@ export function AuthModal() {
 
   const onLoginSubmit = async (values: z.infer<typeof loginSchema>) => {
     setIsLoading(true);
-    const success = await login(values.email, values.password);
-    if (!success) {
+    const result = await login(values.email, values.password);
+    if (!result.success) {
       toast({
         variant: "destructive",
         title: "Error de inicio de sesión",
@@ -79,17 +79,19 @@ export function AuthModal() {
 
   const onRegisterSubmit = async (values: z.infer<typeof registerSchema>) => {
     setIsLoading(true);
-    const success = await register(values);
-    if (!success) {
+    const result = await register(values);
+    if (!result.success) {
       toast({
         variant: "destructive",
         title: "Error de registro",
         description: "No se pudo crear la cuenta. Intente nuevamente.",
       });
-       setIsLoading(false);
     } else {
-      router.push('/complete-profile');
+       if (!result.callbackHandled) {
+        router.push('/complete-profile');
+      }
     }
+    setIsLoading(false);
   };
 
   return (

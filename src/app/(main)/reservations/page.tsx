@@ -69,7 +69,7 @@ const defaultValues = {
 
 export default function ReservationsPage() {
   const { toast } = useToast();
-  const { isAuthenticated, user, showAuthModal } = useAuth();
+  const { isAuthenticated, user, showAuthModal, logout } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
   const [step, setStep] = useState(1);
@@ -214,8 +214,15 @@ export default function ReservationsPage() {
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-2xl">
-      <header className="text-center mb-8">
-        <h1 className="text-4xl font-headline">Haz tu Reserva</h1>
+      <header className="mb-8">
+        <div className="flex justify-between items-center">
+            <h1 className="text-4xl font-headline">Haz tu Reserva</h1>
+            {isAuthenticated && (
+                <Button variant="link" onClick={logout}>
+                    Cerrar Sesión
+                </Button>
+            )}
+        </div>
         <p className="text-muted-foreground">Asegura tu lugar en nuestra mesa.</p>
       </header>
       
@@ -388,5 +395,3 @@ export default function ReservationsPage() {
     </div>
   );
 }
-
-    

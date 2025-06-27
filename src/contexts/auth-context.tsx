@@ -1,3 +1,4 @@
+
 "use client";
 
 import React, { createContext, useState, useContext, ReactNode } from 'react';
@@ -10,9 +11,9 @@ interface AuthContextType {
   isAuthModalOpen: boolean;
   showAuthModal: (onSuccess?: () => void) => void;
   closeAuthModal: () => void;
-  login: (email: string, pass: string) => Promise<boolean>;
+  login: (email: string, pass: string) => Promise<{ success: boolean; callbackHandled: boolean }>;
   logout: () => void;
-  register: (userData: { email: string, password: string, promociones: boolean }) => Promise<boolean>;
+  register: (userData: { email: string, password: string, promociones: boolean }) => Promise<{ success: boolean; callbackHandled: boolean }>;
   updateUser: (userData: Partial<User>) => void;
 }
 
@@ -35,7 +36,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setOnLoginSuccess(null);
   };
 
-  const login = async (email: string, pass: string): Promise<boolean> => {
+  const login = async (email: string, pass: string): Promise<{ success: boolean; callbackHandled: boolean }> => {
     // Mock login logic
     console.log(`Attempting login with ${email}`);
     return new Promise(resolve => {
@@ -46,10 +47,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           if (onLoginSuccess) {
             onLoginSuccess();
             setOnLoginSuccess(null);
+            resolve({ success: true, callbackHandled: true });
+          } else {
+            resolve({ success: true, callbackHandled: false });
           }
-          resolve(true);
         } else {
-          resolve(false);
+          resolve({ success: false, callbackHandled: false });
         }
       }, 1000);
     });
@@ -59,7 +62,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setUser(null);
   };
 
-  const register = async (userData: { email: string, password: string, promociones: boolean }): Promise<boolean> => {
+  const register = async (userData: { email: string, password: string, promociones: boolean }): Promise<{ success: boolean; callbackHandled: boolean }> => {
     // Mock register logic
     console.log('Registering user:', userData.email);
     return new Promise(resolve => {
@@ -74,8 +77,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
          if (onLoginSuccess) {
             onLoginSuccess();
             setOnLoginSuccess(null);
+            resolve({ success: true, callbackHandled: true });
+          } else {
+            resolve({ success: true, callbackHandled: false });
           }
-        resolve(true);
       }, 1000);
     });
   };
