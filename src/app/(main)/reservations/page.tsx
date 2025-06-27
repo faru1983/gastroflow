@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useForm } from 'react-hook-form';
@@ -18,6 +19,7 @@ import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { useEffect, useState, useCallback } from 'react';
 import { Switch } from '@/components/ui/switch';
+import { Label } from '@/components/ui/label';
 
 const reservationSchema = z.object({
   date: z.date({ required_error: 'La fecha es requerida.' }),
@@ -216,7 +218,7 @@ export default function ReservationsPage() {
                     )} />
                      <FormField control={form.control} name="time" render={({ field }) => (
                         <FormItem>
-                            <Select onValueChange={field.onChange} value={field.value}>
+                            <Select onValueChange={field.onChange} value={field.value || ''}>
                                 <FormControl><SelectTrigger><SelectValue placeholder="Selecciona hora" /></SelectTrigger></FormControl>
                                 <SelectContent>{timeSlots.map(slot => <SelectItem key={slot} value={slot}>{slot} hrs</SelectItem>)}</SelectContent>
                             </Select>
@@ -227,7 +229,7 @@ export default function ReservationsPage() {
                 <div className="grid md:grid-cols-2 gap-4">
                     <FormField control={form.control} name="people" render={({ field }) => (
                         <FormItem>
-                             <Select onValueChange={(val) => field.onChange(Number(val))} value={field.value ? String(field.value) : undefined}>
+                             <Select onValueChange={(val) => field.onChange(Number(val))} value={field.value ? String(field.value) : ''}>
                                 <FormControl><SelectTrigger><SelectValue placeholder="Cantidad personas" /></SelectTrigger></FormControl>
                                 <SelectContent>{Array.from({ length: 8 }, (_, i) => i + 1).map(p => <SelectItem key={p} value={String(p)}>{p} persona{p>1 && 's'}</SelectItem>)}</SelectContent>
                             </Select>
@@ -236,7 +238,7 @@ export default function ReservationsPage() {
                     )} />
                     <FormField control={form.control} name="preference" render={({ field }) => (
                         <FormItem>
-                             <Select onValueChange={field.onChange} value={field.value}>
+                             <Select onValueChange={field.onChange} value={field.value || ''}>
                                 <FormControl><SelectTrigger><SelectValue placeholder="Lugar preferencia" /></SelectTrigger></FormControl>
                                 <SelectContent>
                                     <SelectItem value="Interior">Interior</SelectItem>
@@ -250,7 +252,7 @@ export default function ReservationsPage() {
                 </div>
                  <FormField control={form.control} name="reason" render={({ field }) => (
                     <FormItem>
-                        <Select onValueChange={field.onChange} value={field.value}>
+                        <Select onValueChange={field.onChange} value={field.value || ''}>
                             <FormControl><SelectTrigger><SelectValue placeholder="Motivo visita" /></SelectTrigger></FormControl>
                             <SelectContent>
                                 <SelectItem value="General">General</SelectItem>
@@ -290,11 +292,11 @@ export default function ReservationsPage() {
                     )} />
                 </div>
                  <div className="space-y-2">
-                    <p className="text-sm font-medium text-muted-foreground">Fecha de Nacimiento</p>
+                    <Label>Fecha de Nacimiento</Label>
                     <div className="grid grid-cols-3 gap-4">
                         <FormField control={form.control} name="day" render={({ field }) => (
                             <FormItem>
-                                <Select onValueChange={field.onChange} value={field.value}>
+                                <Select onValueChange={field.onChange} value={field.value || ''}>
                                     <FormControl><SelectTrigger><SelectValue placeholder="Día" /></SelectTrigger></FormControl>
                                     <SelectContent>{days.map(d => <SelectItem key={d} value={d}>{d}</SelectItem>)}</SelectContent>
                                 </Select>
@@ -303,7 +305,7 @@ export default function ReservationsPage() {
                         )} />
                         <FormField control={form.control} name="month" render={({ field }) => (
                             <FormItem>
-                                <Select onValueChange={field.onChange} value={field.value}>
+                                <Select onValueChange={field.onChange} value={field.value || ''}>
                                     <FormControl><SelectTrigger><SelectValue placeholder="Mes" /></SelectTrigger></FormControl>
                                     <SelectContent>{months.map(m => <SelectItem key={m.value} value={m.value}>{m.label}</SelectItem>)}</SelectContent>
                                 </Select>
@@ -312,7 +314,7 @@ export default function ReservationsPage() {
                         )} />
                         <FormField control={form.control} name="year" render={({ field }) => (
                             <FormItem>
-                                <Select onValueChange={field.onChange} value={field.value}>
+                                <Select onValueChange={field.onChange} value={field.value || ''}>
                                     <FormControl><SelectTrigger><SelectValue placeholder="Año" /></SelectTrigger></FormControl>
                                     <SelectContent>{years.map(y => <SelectItem key={y} value={y.toString()}>{y}</SelectItem>)}</SelectContent>
                                 </Select>
