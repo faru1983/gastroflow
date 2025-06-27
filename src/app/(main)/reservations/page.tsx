@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useForm } from 'react-hook-form';
@@ -167,32 +168,21 @@ export default function ReservationsPage() {
             description: `Gracias ${data.nombre}, tu mesa para ${data.people} ha sido reservada para el ${format(data.date, 'PPP', { locale: es })} a las ${data.time}.`,
         });
         
-        const newDefaultValues = {
+        const newDefaultValues: z.infer<typeof reservationSchema> | {} = {
+            ...defaultValues,
             date: undefined,
-            time: '',
             people: undefined,
-            preference: '',
-            reason: '',
-            comments: '',
-            nombre: '',
-            apellidos: '',
-            email: '',
-            celular: '+569-',
-            fechaNacimiento: '',
-            comuna: '',
-            instagram: '',
-            promociones: true,
         };
 
         if (isAuthenticated && user) {
-            newDefaultValues.nombre = user.nombre || '';
-            newDefaultValues.apellidos = user.apellidos || '';
-            newDefaultValues.email = user.email || '';
-            newDefaultValues.celular = user.celular || '+569-';
-            newDefaultValues.fechaNacimiento = user.fechaNacimiento ? user.fechaNacimiento.split('-').reverse().join('-') : '';
-            newDefaultValues.comuna = user.comuna || '';
-            newDefaultValues.instagram = user.instagram || '';
-            newDefaultValues.promociones = user.promociones ?? true;
+            (newDefaultValues as any).nombre = user.nombre || '';
+            (newDefaultValues as any).apellidos = user.apellidos || '';
+            (newDefaultValues as any).email = user.email || '';
+            (newDefaultValues as any).celular = user.celular || '+569-';
+            (newDefaultValues as any).fechaNacimiento = user.fechaNacimiento ? user.fechaNacimiento.split('-').reverse().join('-') : '';
+            (newDefaultValues as any).comuna = user.comuna || '';
+            (newDefaultValues as any).instagram = user.instagram || '';
+            (newDefaultValues as any).promociones = user.promociones ?? true;
         }
 
         form.reset(newDefaultValues);
@@ -313,7 +303,7 @@ export default function ReservationsPage() {
                         <FormItem>
                             <FormControl>
                                 <Input
-                                    placeholder="Fecha de Nacimiento (opcional, DD-MM-YYYY)"
+                                    placeholder="Fecha nacimiento (DD-MM-YYYY)"
                                     {...field}
                                     onChange={(e) => handleDateChange(e, field.onChange)}
                                 />
@@ -343,7 +333,7 @@ export default function ReservationsPage() {
                 />
             </div>
 
-            <Button type="submit" className="w-full text-lg py-6 bg-accent text-accent-foreground hover:bg-accent/90" disabled={isLoading || !form.formState.isValid}>
+            <Button type="submit" className="w-full text-lg py-6 bg-accent text-accent-foreground hover:bg-accent/90" disabled={isLoading}>
               {isLoading ? <Loader2 className="animate-spin" /> : 'Reservar'}
             </Button>
         </form>

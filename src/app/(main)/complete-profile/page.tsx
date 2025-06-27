@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useForm } from 'react-hook-form';
@@ -176,7 +177,7 @@ export default function CompleteProfilePage() {
                         )} />
                         <FormField control={form.control} name="instagram" render={({ field }) => (<FormItem><FormControl><Input placeholder="Instagram (opcional)" {...field} /></FormControl><FormMessage /></FormItem>)} />
                     </div>
-                    <Button type="submit" className="w-full bg-accent text-accent-foreground hover:bg-accent/90" disabled={isLoading || !form.formState.isValid}>
+                    <Button type="submit" className="w-full bg-accent text-accent-foreground hover:bg-accent/90" disabled={isLoading}>
                         {isLoading ? <Loader2 className="animate-spin" /> : 'Guardar y continuar'}
                     </Button>
                 </form>

@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState } from 'react';
@@ -132,7 +133,7 @@ export function AuthModal() {
                     </FormItem>
                   )}
                 />
-                <Button type="submit" className="w-full bg-accent text-accent-foreground hover:bg-accent/90" disabled={isLoading || !loginForm.formState.isValid}>
+                <Button type="submit" className="w-full bg-accent text-accent-foreground hover:bg-accent/90" disabled={isLoading}>
                    {isLoading ? <Loader2 className="animate-spin" /> : 'Entrar'}
                 </Button>
                  <Button variant="link" size="sm" className="w-full">Olvidé mi contraseña</Button>
@@ -164,7 +165,7 @@ export function AuthModal() {
                     </FormItem>
                   )}
                 />
-                <Button type="submit" className="w-full bg-accent text-accent-foreground hover:bg-accent/90" disabled={isLoading || !registerForm.formState.isValid}>
+                <Button type="submit" className="w-full bg-accent text-accent-foreground hover:bg-accent/90" disabled={isLoading}>
                   {isLoading ? <Loader2 className="animate-spin" /> : 'Continuar'}
                 </Button>
               </form>
