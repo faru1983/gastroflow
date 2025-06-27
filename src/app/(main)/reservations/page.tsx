@@ -328,8 +328,9 @@ export default function ReservationsPage() {
                                         <SelectItem value="Cumpleaños">Cumpleaños</SelectItem>
                                         <SelectItem value="Cita">Cita</SelectItem>
                                         <SelectItem value="Negocios">Negocios</SelectItem>
-                                    </Select>
-                                    <FormMessage />
+                                    </SelectContent>
+                                </Select>
+                                <FormMessage />
                             </FormItem>
                         )} />
                         <FormField control={form.control} name="comments" render={({ field }) => (
@@ -389,14 +390,13 @@ export default function ReservationsPage() {
                             )} />
                         </div>
                         <FormField control={form.control} name="fechaNacimiento" render={({ field }) => (
-                                <FormItem>
-                                    <FormControl>
-                                        <Input placeholder="Fecha nacimiento (DD-MM-YYYY)" {...field} onChange={(e) => handleDateChange(e, field.onChange)} />
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
+                            <FormItem>
+                                <FormControl>
+                                    <Input placeholder="Fecha nacimiento (DD-MM-YYYY)" {...field} onChange={(e) => handleDateChange(e, field.onChange)} />
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )} />
                         <FormField control={form.control} name="comuna" render={({ field }) => (<FormItem><FormControl><Input placeholder="Comuna" {...field} /></FormControl><FormMessage /></FormItem>)} />
                         <FormField control={form.control} name="instagram" render={({ field }) => (<FormItem><FormControl><Input placeholder="Instagram" {...field} /></FormControl><FormMessage /></FormItem>)} />
                         <FormField control={form.control} name="promociones" render={({ field }) => (
@@ -423,5 +423,3 @@ export default function ReservationsPage() {
     </div>
   );
 }
-
-    
