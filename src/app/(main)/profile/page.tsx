@@ -13,7 +13,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { mockReservations, mockVisits } from '@/lib/data';
 import { useToast } from '@/hooks/use-toast';
 import { Badge } from '@/components/ui/badge';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 function LoggedOutView() {
     const { showAuthModal } = useAuth();
@@ -42,17 +41,10 @@ function LoggedInView() {
     const [deleteConfirmText, setDeleteConfirmText] = useState("");
     const { toast } = useToast();
     
-    const currentYear = new Date().getFullYear();
-    const years = Array.from({ length: 100 }, (_, i) => currentYear - i);
-    const months = Array.from({ length: 12 }, (_, i) => ({ value: (i + 1).toString(), label: (i + 1).toString().padStart(2, '0') }));
-    const days = Array.from({ length: 31 }, (_, i) => (i + 1).toString());
-
     const [formData, setFormData] = useState({
         nombre: user?.nombre || '',
         apellidos: user?.apellidos || '',
-        day: user?.fechaNacimiento?.split('-')[2] || undefined,
-        month: user?.fechaNacimiento?.split('-')[1] || undefined,
-        year: user?.fechaNacimiento?.split('-')[0] || undefined,
+        fechaNacimiento: user?.fechaNacimiento ? user.fechaNacimiento.split('-').reverse().join('-') : '',
         comuna: user?.comuna || '',
         instagram: user?.instagram || '',
         email: user?.email || '',
@@ -64,14 +56,11 @@ function LoggedInView() {
     });
 
     useEffect(() => {
-        if(user) {
-            const [year, month, day] = user.fechaNacimiento?.split('-') || [];
+        if(user && !isEditing) {
             setFormData({
                 nombre: user.nombre || '',
                 apellidos: user.apellidos || '',
-                day: day || undefined,
-                month: month ? parseInt(month, 10).toString() : undefined,
-                year: year || undefined,
+                fechaNacimiento: user.fechaNacimiento ? user.fechaNacimiento.split('-').reverse().join('-') : '',
                 comuna: user.comuna || '',
                 instagram: user.instagram || '',
                 email: user.email || '',
@@ -116,12 +105,24 @@ function LoggedInView() {
         setFormData({ ...formData, celular: formatted });
     };
 
-    const handleSelectChange = (name: string, value: string) => {
-        setFormData({ ...formData, [name]: value });
+    const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        let value = e.target.value.replace(/\D/g, '');
+        if (value.length > 8) {
+            value = value.substring(0, 8);
+        }
+        let formattedValue = '';
+        if (value.length > 4) {
+            formattedValue = `${value.substring(0, 2)}-${value.substring(2, 4)}-${value.substring(4)}`;
+        } else if (value.length > 2) {
+            formattedValue = `${value.substring(0, 2)}-${value.substring(2)}`;
+        } else {
+            formattedValue = value;
+        }
+        setFormData({ ...formData, fechaNacimiento: formattedValue });
     };
 
     const handleUpdate = () => {
-        const { day, month, year, currentPassword, newPassword, confirmNewPassword, ...rest } = formData;
+        const { currentPassword, newPassword, confirmNewPassword, fechaNacimiento, ...rest } = formData;
         
         if (newPassword || currentPassword) {
             if (newPassword !== confirmNewPassword) {
@@ -133,9 +134,22 @@ function LoggedInView() {
                 return;
             }
         }
+
+        if (fechaNacimiento) {
+             if (!/^\d{2}-\d{2}-\d{4}$/.test(fechaNacimiento)) {
+                toast({ variant: "destructive", title: "Error", description: "Formato de fecha no válido. Usa DD-MM-YYYY." });
+                return;
+            }
+            const [day, month, year] = fechaNacimiento.split('-').map(Number);
+            const date = new Date(year, month - 1, day);
+            if (!(date.getFullYear() === year && date.getMonth() === month - 1 && date.getDate() === day)) {
+                toast({ variant: "destructive", title: "Error", description: "Fecha de nacimiento no es válida." });
+                return;
+            }
+        }
         
-        const fechaNacimiento = (year && month && day) ? `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}` : undefined;
-        updateUser({ ...rest, fechaNacimiento, comuna: formData.comuna || '' });
+        const formattedFechaNacimiento = fechaNacimiento ? fechaNacimiento.split('-').reverse().join('-') : undefined;
+        updateUser({ ...rest, fechaNacimiento: formattedFechaNacimiento, comuna: formData.comuna || '' });
         setIsEditing(false);
         toast({ title: "¡Éxito!", description: "Tu información ha sido actualizada correctamente." });
     }
@@ -160,23 +174,8 @@ function LoggedInView() {
                         <Input name="apellidos" placeholder="Apellidos" value={formData.apellidos} onChange={handleInputChange} disabled={!isEditing} />
                     </div>
                     
-                    <div className="space-y-2">
-                        <div className="grid grid-cols-3 gap-4">
-                             <Select onValueChange={(value) => handleSelectChange('day', value)} value={formData.day} disabled={!isEditing}>
-                                <SelectTrigger><SelectValue placeholder="Día" /></SelectTrigger>
-                                <SelectContent>{days.map(d => <SelectItem key={d} value={d}>{d}</SelectItem>)}</SelectContent>
-                            </Select>
-                            <Select onValueChange={(value) => handleSelectChange('month', value)} value={formData.month} disabled={!isEditing}>
-                                <SelectTrigger><SelectValue placeholder="Mes" /></SelectTrigger>
-                                <SelectContent>{months.map(m => <SelectItem key={m.value} value={m.value}>{m.label}</SelectItem>)}</SelectContent>
-                            </Select>
-                            <Select onValueChange={(value) => handleSelectChange('year', value)} value={formData.year} disabled={!isEditing}>
-                                <SelectTrigger><SelectValue placeholder="Año" /></SelectTrigger>
-                                <SelectContent>{years.map(y => <SelectItem key={y} value={y.toString()}>{y}</SelectItem>)}</SelectContent>
-                            </Select>
-                        </div>
-                    </div>
-
+                    <Input name="fechaNacimiento" placeholder="Fecha de Nacimiento (DD-MM-YYYY)" value={formData.fechaNacimiento} onChange={handleDateChange} disabled={!isEditing} />
+                    
                     <Input name="comuna" placeholder="Comuna (opcional)" value={formData.comuna} onChange={handleInputChange} disabled={!isEditing} />
                     
                     <div className="grid md:grid-cols-2 gap-4">

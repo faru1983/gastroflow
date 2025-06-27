@@ -18,7 +18,6 @@ import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { useEffect, useState, useCallback } from 'react';
 import { Switch } from '@/components/ui/switch';
-import { Label } from '@/components/ui/label';
 
 const reservationSchema = z.object({
   date: z.date({ required_error: 'La fecha es requerida.' }),
@@ -31,22 +30,16 @@ const reservationSchema = z.object({
   apellidos: z.string().min(1, 'Apellidos son requeridos.'),
   email: z.string().email('Email no válido.'),
   celular: z.string().min(1, 'Celular es requerido.'),
-  day: z.string().optional(),
-  month: z.string().optional(),
-  year: z.string().optional(),
+  fechaNacimiento: z.string().optional().or(z.literal("")).refine((val) => {
+    if (!val) return true;
+    if (!/^\d{2}-\d{2}-\d{4}$/.test(val)) return false;
+    const [day, month, year] = val.split('-').map(Number);
+    const date = new Date(year, month - 1, day);
+    return date.getFullYear() === year && date.getMonth() === month - 1 && date.getDate() === day;
+  }, { message: "Fecha no válida. Usa el formato DD-MM-YYYY." }),
   comuna: z.string().optional(),
   instagram: z.string().optional(),
   promociones: z.boolean().default(true),
-}).refine(data => {
-    if (!data.year || !data.month || !data.day) return true;
-    const year = parseInt(data.year, 10);
-    const month = parseInt(data.month, 10);
-    const day = parseInt(data.day, 10);
-    const date = new Date(year, month - 1, day);
-    return date.getFullYear() === year && date.getMonth() === month - 1 && date.getDate() === day;
-}, {
-    message: "Fecha de nacimiento no válida.",
-    path: ["day"], 
 });
 
 const timeSlots = Array.from({ length: 9 }, (_, i) => {
@@ -54,11 +47,6 @@ const timeSlots = Array.from({ length: 9 }, (_, i) => {
     const minute = i % 2 === 0 ? '00' : '30';
     return `${hour.toString().padStart(2, '0')}:${minute}`;
 });
-
-const currentYear = new Date().getFullYear();
-const years = Array.from({ length: 100 }, (_, i) => currentYear - i);
-const months = Array.from({ length: 12 }, (_, i) => ({ value: (i + 1).toString(), label: (i + 1).toString().padStart(2, '0') }));
-const days = Array.from({ length: 31 }, (_, i) => (i + 1).toString());
 
 const defaultValues = {
   date: undefined,
@@ -71,9 +59,7 @@ const defaultValues = {
   apellidos: '',
   email: '',
   celular: '+569-',
-  day: '',
-  month: '',
-  year: '',
+  fechaNacimiento: '',
   comuna: '',
   instagram: '',
   promociones: true,
@@ -93,16 +79,13 @@ export default function ReservationsPage() {
 
   const prefillForm = useCallback(() => {
     if (user) {
-        const [year, month, day] = user.fechaNacimiento?.split('-') || [];
         form.reset({
             ...form.getValues(),
             nombre: user.nombre || '',
             apellidos: user.apellidos || '',
             email: user.email || '',
             celular: user.celular || '+569-',
-            day: day || '',
-            month: month ? parseInt(month, 10).toString() : '',
-            year: year || '',
+            fechaNacimiento: user.fechaNacimiento ? user.fechaNacimiento.split('-').reverse().join('-') : '',
             comuna: user.comuna || '',
             instagram: user.instagram || '',
             promociones: user.promociones ?? true,
@@ -155,6 +138,25 @@ export default function ReservationsPage() {
     
     fieldOnChange(formatted);
   };
+  
+  const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>, fieldOnChange: (...event: any[]) => void) => {
+    let value = e.target.value.replace(/\D/g, '');
+    
+    if (value.length > 8) {
+        value = value.substring(0, 8);
+    }
+
+    let formattedValue = '';
+    if (value.length > 4) {
+        formattedValue = `${value.substring(0, 2)}-${value.substring(2, 4)}-${value.substring(4)}`;
+    } else if (value.length > 2) {
+        formattedValue = `${value.substring(0, 2)}-${value.substring(2)}`;
+    } else {
+        formattedValue = value;
+    }
+
+    fieldOnChange(formattedValue);
+  };
 
   function onSubmit(data: z.infer<typeof reservationSchema>) {
     setIsLoading(true);
@@ -165,16 +167,29 @@ export default function ReservationsPage() {
             description: `Gracias ${data.nombre}, tu mesa para ${data.people} ha sido reservada para el ${format(data.date, 'PPP', { locale: es })} a las ${data.time}.`,
         });
         
-        const newDefaultValues = {...defaultValues};
+        const newDefaultValues = {
+            date: undefined,
+            time: '',
+            people: undefined,
+            preference: '',
+            reason: '',
+            comments: '',
+            nombre: '',
+            apellidos: '',
+            email: '',
+            celular: '+569-',
+            fechaNacimiento: '',
+            comuna: '',
+            instagram: '',
+            promociones: true,
+        };
+
         if (isAuthenticated && user) {
-            const [year, month, day] = user.fechaNacimiento?.split('-') || [];
             newDefaultValues.nombre = user.nombre || '';
             newDefaultValues.apellidos = user.apellidos || '';
             newDefaultValues.email = user.email || '';
             newDefaultValues.celular = user.celular || '+569-';
-            newDefaultValues.day = day || '';
-            newDefaultValues.month = month ? parseInt(month, 10).toString() : '';
-            newDefaultValues.year = year || '';
+            newDefaultValues.fechaNacimiento = user.fechaNacimiento ? user.fechaNacimiento.split('-').reverse().join('-') : '';
             newDefaultValues.comuna = user.comuna || '';
             newDefaultValues.instagram = user.instagram || '';
             newDefaultValues.promociones = user.promociones ?? true;
@@ -291,37 +306,22 @@ export default function ReservationsPage() {
                         </FormItem>
                     )} />
                 </div>
-                 <div className="space-y-2">
-                    <div className="grid grid-cols-3 gap-4">
-                        <FormField control={form.control} name="day" render={({ field }) => (
-                            <FormItem>
-                                <Select onValueChange={field.onChange} value={field.value || ''}>
-                                    <FormControl><SelectTrigger><SelectValue placeholder="Día" /></SelectTrigger></FormControl>
-                                    <SelectContent>{days.map(d => <SelectItem key={d} value={d}>{d}</SelectItem>)}</SelectContent>
-                                </Select>
-                                <FormMessage/>
-                            </FormItem>
-                        )} />
-                        <FormField control={form.control} name="month" render={({ field }) => (
-                            <FormItem>
-                                <Select onValueChange={field.onChange} value={field.value || ''}>
-                                    <FormControl><SelectTrigger><SelectValue placeholder="Mes" /></SelectTrigger></FormControl>
-                                    <SelectContent>{months.map(m => <SelectItem key={m.value} value={m.value}>{m.label}</SelectItem>)}</SelectContent>
-                                </Select>
-                                <FormMessage/>
-                            </FormItem>
-                        )} />
-                        <FormField control={form.control} name="year" render={({ field }) => (
-                            <FormItem>
-                                <Select onValueChange={field.onChange} value={field.value || ''}>
-                                    <FormControl><SelectTrigger><SelectValue placeholder="Año" /></SelectTrigger></FormControl>
-                                    <SelectContent>{years.map(y => <SelectItem key={y} value={y.toString()}>{y}</SelectItem>)}</SelectContent>
-                                </Select>
-                                <FormMessage/>
-                            </FormItem>
-                        )} />
-                    </div>
-                </div>
+                 <FormField
+                    control={form.control}
+                    name="fechaNacimiento"
+                    render={({ field }) => (
+                        <FormItem>
+                            <FormControl>
+                                <Input
+                                    placeholder="Fecha de Nacimiento (opcional, DD-MM-YYYY)"
+                                    {...field}
+                                    onChange={(e) => handleDateChange(e, field.onChange)}
+                                />
+                            </FormControl>
+                            <FormMessage />
+                        </FormItem>
+                    )}
+                />
                 <FormField control={form.control} name="comuna" render={({ field }) => (<FormItem><FormControl><Input placeholder="Comuna (opcional)" {...field} /></FormControl><FormMessage /></FormItem>)} />
                 <FormField control={form.control} name="instagram" render={({ field }) => (<FormItem><FormControl><Input placeholder="Instagram (opcional)" {...field} /></FormControl><FormMessage /></FormItem>)} />
                 <FormField

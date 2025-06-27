@@ -12,34 +12,20 @@ import { Loader2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 const completeProfileSchema = z.object({
   nombre: z.string().min(1, 'Nombre es requerido.'),
   apellidos: z.string().min(1, 'Apellidos son requeridos.'),
-  day: z.string({ required_error: "Día es requerido."}),
-  month: z.string({ required_error: "Mes es requerido."}),
-  year: z.string({ required_error: "Año es requerido."}),
+  fechaNacimiento: z.string({ required_error: 'Fecha de nacimiento es requerida.' }).min(10, { message: 'Formato debe ser DD-MM-YYYY.' }).refine(val => {
+      if (!/^\d{2}-\d{2}-\d{4}$/.test(val)) return false;
+      const [day, month, year] = val.split('-').map(Number);
+      const date = new Date(year, month - 1, day);
+      return date.getFullYear() === year && date.getMonth() === month - 1 && date.getDate() === day;
+  }, { message: "Fecha no válida." }),
   comuna: z.string().optional(),
   instagram: z.string().optional(),
   celular: z.string().min(1, 'Celular es requerido.'),
-}).refine(data => {
-    if (!data.year || !data.month || !data.day) return true;
-    const year = parseInt(data.year, 10);
-    const month = parseInt(data.month, 10);
-    const day = parseInt(data.day, 10);
-    const date = new Date(year, month - 1, day);
-    return date.getFullYear() === year && date.getMonth() === month - 1 && date.getDate() === day;
-}, {
-    message: "Fecha no válida.",
-    path: ["day"], 
 });
-
-const currentYear = new Date().getFullYear();
-const years = Array.from({ length: 100 }, (_, i) => currentYear - i);
-const months = Array.from({ length: 12 }, (_, i) => ({ value: (i + 1).toString(), label: (i + 1).toString().padStart(2, '0') }));
-const days = Array.from({ length: 31 }, (_, i) => (i + 1).toString());
-
 
 export default function CompleteProfilePage() {
   const { toast } = useToast();
@@ -52,9 +38,7 @@ export default function CompleteProfilePage() {
     defaultValues: {
       nombre: user?.nombre || '',
       apellidos: user?.apellidos || '',
-      day: user?.fechaNacimiento?.split('-')[2] || undefined,
-      month: user?.fechaNacimiento?.split('-')[1] || undefined,
-      year: user?.fechaNacimiento?.split('-')[0] || undefined,
+      fechaNacimiento: user?.fechaNacimiento ? user.fechaNacimiento.split('-').reverse().join('-') : '',
       comuna: user?.comuna || '',
       instagram: user?.instagram || '',
       celular: user?.celular || '+569-',
@@ -70,13 +54,10 @@ export default function CompleteProfilePage() {
 
   useEffect(() => {
     if (user) {
-        const [year, month, day] = user.fechaNacimiento?.split('-') || [];
         form.reset({
             nombre: user.nombre || '',
             apellidos: user.apellidos || '',
-            day: day || undefined,
-            month: month ? parseInt(month, 10).toString() : undefined,
-            year: year || undefined,
+            fechaNacimiento: user.fechaNacimiento ? user.fechaNacimiento.split('-').reverse().join('-') : '',
             comuna: user.comuna || '',
             instagram: user.instagram || '',
             celular: user.celular || '+569-',
@@ -111,13 +92,32 @@ export default function CompleteProfilePage() {
     
     fieldOnChange(formatted);
   };
+  
+  const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>, fieldOnChange: (...event: any[]) => void) => {
+    let value = e.target.value.replace(/\D/g, '');
+    
+    if (value.length > 8) {
+        value = value.substring(0, 8);
+    }
 
+    let formattedValue = '';
+    if (value.length > 4) {
+        formattedValue = `${value.substring(0, 2)}-${value.substring(2, 4)}-${value.substring(4)}`;
+    } else if (value.length > 2) {
+        formattedValue = `${value.substring(0, 2)}-${value.substring(2)}`;
+    } else {
+        formattedValue = value;
+    }
+
+    fieldOnChange(formattedValue);
+  };
 
   function onSubmit(data: z.infer<typeof completeProfileSchema>) {
     setIsLoading(true);
-    const { day, month, year, ...rest } = data;
-    const fechaNacimiento = `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
-    updateUser({ ...rest, fechaNacimiento, comuna: data.comuna || '' });
+    const { fechaNacimiento, ...rest } = data;
+    const formattedFechaNacimiento = fechaNacimiento.split('-').reverse().join('-');
+    
+    updateUser({ ...rest, fechaNacimiento: formattedFechaNacimiento, comuna: data.comuna || '' });
     toast({
         title: "¡Perfil completado!",
         description: "Tus datos han sido guardados exitosamente.",
@@ -148,37 +148,22 @@ export default function CompleteProfilePage() {
                         <FormField control={form.control} name="nombre" render={({ field }) => (<FormItem><FormControl><Input placeholder="Nombre" {...field} /></FormControl><FormMessage /></FormItem>)} />
                         <FormField control={form.control} name="apellidos" render={({ field }) => (<FormItem><FormControl><Input placeholder="Apellidos" {...field} /></FormControl><FormMessage /></FormItem>)} />
                     </div>
-                     <div className="space-y-2">
-                        <div className="grid grid-cols-3 gap-4">
-                            <FormField control={form.control} name="day" render={({ field }) => (
-                                <FormItem>
-                                    <Select onValueChange={field.onChange} value={field.value}>
-                                        <FormControl><SelectTrigger><SelectValue placeholder="Día" /></SelectTrigger></FormControl>
-                                        <SelectContent>{days.map(d => <SelectItem key={d} value={d}>{d}</SelectItem>)}</SelectContent>
-                                    </Select>
-                                    <FormMessage/>
-                                </FormItem>
-                            )} />
-                            <FormField control={form.control} name="month" render={({ field }) => (
-                                <FormItem>
-                                    <Select onValueChange={field.onChange} value={field.value}>
-                                        <FormControl><SelectTrigger><SelectValue placeholder="Mes" /></SelectTrigger></FormControl>
-                                        <SelectContent>{months.map(m => <SelectItem key={m.value} value={m.value}>{m.label}</SelectItem>)}</SelectContent>
-                                    </Select>
-                                    <FormMessage/>
-                                </FormItem>
-                            )} />
-                            <FormField control={form.control} name="year" render={({ field }) => (
-                                <FormItem>
-                                    <Select onValueChange={field.onChange} value={field.value}>
-                                        <FormControl><SelectTrigger><SelectValue placeholder="Año" /></SelectTrigger></FormControl>
-                                        <SelectContent>{years.map(y => <SelectItem key={y} value={y.toString()}>{y}</SelectItem>)}</SelectContent>
-                                    </Select>
-                                    <FormMessage/>
-                                </FormItem>
-                            )} />
-                        </div>
-                    </div>
+                     <FormField
+                        control={form.control}
+                        name="fechaNacimiento"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormControl>
+                                    <Input
+                                        placeholder="Fecha de Nacimiento (DD-MM-YYYY)"
+                                        {...field}
+                                        onChange={(e) => handleDateChange(e, field.onChange)}
+                                    />
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
                     <FormField control={form.control} name="comuna" render={({ field }) => (<FormItem><FormControl><Input placeholder="Comuna (opcional)" {...field} /></FormControl><FormMessage /></FormItem>)} />
                     <div className="grid md:grid-cols-2 gap-4">
                         <FormField control={form.control} name="celular" render={({ field }) => (
