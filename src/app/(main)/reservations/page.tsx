@@ -159,6 +159,17 @@ export default function ReservationsPage() {
     const fields: (keyof z.infer<typeof reservationSchema>)[] = ['date', 'time', 'people', 'preference', 'reason'];
     const isValid = await form.trigger(fields);
     if (isValid) {
+      // Save reservation data to localStorage before moving to the user step
+      const reservationData = form.getValues();
+      localStorage.setItem('pendingReservation', JSON.stringify({
+        date: reservationData.date,
+        time: reservationData.time,
+        people: reservationData.people,
+        preference: reservationData.preference,
+        reason: reservationData.reason,
+        comments: reservationData.comments,
+      }));
+
       if (isAuthenticated) {
         setStep(3);
       } else {
@@ -168,17 +179,6 @@ export default function ReservationsPage() {
   };
 
   const handleLogin = () => {
-    const reservationData = form.getValues();
-    // Save reservation data to localStorage before showing the auth modal
-    localStorage.setItem('pendingReservation', JSON.stringify({
-      date: reservationData.date,
-      time: reservationData.time,
-      people: reservationData.people,
-      preference: reservationData.preference,
-      reason: reservationData.reason,
-      comments: reservationData.comments,
-    }));
-    
     showAuthModal({
       onLoginSuccess: () => {
         toast({ title: '¡Bienvenido!', description: 'Tus datos han sido cargados en el formulario.' });
@@ -196,11 +196,13 @@ export default function ReservationsPage() {
             description: `Gracias ${data.nombre}, tu mesa para ${data.people} ha sido reservada para el ${format(data.date, 'PPP', { locale: es })} a las ${data.time}.`,
         });
         
-        const newDefaultValues: z.infer<typeof reservationSchema> | {} = {
+        const newDefaultValues: Partial<z.infer<typeof reservationSchema>> = {
             ...defaultValues,
             time: '',
             preference: '',
             reason: '',
+            people: undefined,
+            date: undefined,
         };
 
         if (isAuthenticated && user) {
@@ -326,8 +328,8 @@ export default function ReservationsPage() {
                                         <SelectItem value="Cumpleaños">Cumpleaños</SelectItem>
                                         <SelectItem value="Cita">Cita</SelectItem>
                                         <SelectItem value="Negocios">Negocios</SelectItem>
-                                    </SelectContent>
-                                <FormMessage />
+                                    </Select>
+                                    <FormMessage />
                             </FormItem>
                         )} />
                         <FormField control={form.control} name="comments" render={({ field }) => (
