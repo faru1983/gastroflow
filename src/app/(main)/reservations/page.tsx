@@ -146,7 +146,7 @@ export default function ReservationsPage() {
         });
         form.reset();
         setIsLoading(false);
-    }, 1500)
+    }, 1500);
   }
 
   return (
@@ -243,7 +243,7 @@ export default function ReservationsPage() {
                 </div>
                  <div className="grid md:grid-cols-2 gap-4">
                      <FormField control={form.control} name="nombre" render={({ field }) => (<FormItem><FormControl><Input placeholder="Nombre" {...field} /></FormControl><FormMessage /></FormItem>)} />
-                     <FormField control={form.control} name="apellidos" render={({ field }) => (<FormItem><FormControl><Input placeholder="Apellidos" {...field} /></FormControl><FormMessage /></FormMessage>)} />
+                     <FormField control={form.control} name="apellidos" render={({ field }) => (<FormItem><FormControl><Input placeholder="Apellidos" {...field} /></FormControl><FormMessage /></FormItem>)} />
                  </div>
                  <div className="grid md:grid-cols-2 gap-4">
                     <FormField control={form.control} name="email" render={({ field }) => (<FormItem><FormControl><Input type="email" placeholder="Email" {...field} /></FormControl><FormMessage /></FormItem>)} />
