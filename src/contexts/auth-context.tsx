@@ -3,7 +3,7 @@
 
 import React, { createContext, useState, useContext, ReactNode } from 'react';
 import type { User } from '@/lib/types';
-import { mockUser } from '@/lib/data';
+import { mockUser, mockAdminUser } from '@/lib/data';
 
 interface AuthContextType {
   user: User | null;
@@ -46,8 +46,15 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     console.log(`Attempting login with ${email}`);
     return new Promise(resolve => {
       setTimeout(() => {
+        let loggedInUser: User | null = null;
         if (email === 'ana.perez@example.com' && pass === 'password') {
-          setUser(mockUser);
+          loggedInUser = mockUser;
+        } else if (email === 'admin@admin.com' && pass === 'admin') {
+          loggedInUser = mockAdminUser;
+        }
+
+        if (loggedInUser) {
+          setUser(loggedInUser);
           closeAuthModal();
           if (onLoginSuccess) {
             onLoginSuccess();

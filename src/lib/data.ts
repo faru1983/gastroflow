@@ -12,6 +12,18 @@ export const mockUser: User = {
   promociones: true,
 };
 
+export const mockAdminUser: User = {
+  id: '2',
+  nombre: 'Admin',
+  apellidos: 'GastroFlow',
+  fechaNacimiento: '1990-01-01',
+  comuna: 'Santiago',
+  instagram: '@gastroflow',
+  email: 'admin@admin.com',
+  celular: '+56987654321',
+  promociones: false,
+};
+
 export const allergens: Allergen[] = [
   { id: 'gluten', name: 'Gluten' },
   { id: 'lacteos', name: 'Lácteos' },
