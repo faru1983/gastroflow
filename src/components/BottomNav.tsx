@@ -22,17 +22,21 @@ export function BottomNav() {
         {navItems.map((item) => {
           const isActive = (item.href === '/' && pathname === '/') || (item.href !== '/' && pathname.startsWith(item.href));
           return (
-            <Link key={item.href} href={item.href} className="flex flex-col items-center justify-center flex-1 h-full">
+            <Link 
+              key={item.href} 
+              href={item.href} 
+              className="group flex flex-col items-center justify-center flex-1 h-full rounded-md transition-transform duration-200 ease-out hover:scale-105 focus-visible:scale-105 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            >
                 <item.icon
                   className={cn(
-                    'h-6 w-6 mb-1 transition-colors',
-                    isActive ? 'text-primary' : 'text-muted-foreground'
+                    'h-6 w-6 mb-1 transition-all duration-200 ease-out',
+                    isActive ? 'text-primary scale-110 -translate-y-1' : 'text-muted-foreground group-hover:text-primary'
                   )}
                 />
                 <span
                   className={cn(
                     'text-xs font-medium transition-colors',
-                    isActive ? 'text-primary' : 'text-muted-foreground'
+                    isActive ? 'text-primary' : 'text-muted-foreground group-hover:text-primary'
                   )}
                 >
                   {item.label}
