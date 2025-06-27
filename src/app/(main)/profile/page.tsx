@@ -57,7 +57,7 @@ function LoggedInView() {
         instagram: user?.instagram || '',
         email: user?.email || '',
         celular: user?.celular || '',
-        promociones: user?.promociones || false,
+        promociones: user?.promociones ?? true,
         currentPassword: '',
         newPassword: '',
         confirmNewPassword: '',
@@ -76,7 +76,7 @@ function LoggedInView() {
                 instagram: user.instagram || '',
                 email: user.email || '',
                 celular: user.celular || '',
-                promociones: user.promociones || false,
+                promociones: user.promociones,
                 currentPassword: '',
                 newPassword: '',
                 confirmNewPassword: '',
@@ -166,7 +166,7 @@ function LoggedInView() {
                         </div>
                     </div>
 
-                    <Input name="comuna" placeholder="Comuna (Ej: Las Condes)" value={formData.comuna} onChange={handleInputChange} disabled={!isEditing} />
+                    <Input name="comuna" placeholder="Comuna (opcional)" value={formData.comuna} onChange={handleInputChange} disabled={!isEditing} />
                     
                     <div className="grid md:grid-cols-2 gap-4">
                         <Input name="celular" placeholder="Celular (Ej: +569-xxxxxxxx)" value={formData.celular} onChange={handlePhoneChange} disabled={!isEditing} />

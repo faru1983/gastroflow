@@ -20,7 +20,7 @@ const completeProfileSchema = z.object({
   day: z.string({ required_error: "Día es requerido."}),
   month: z.string({ required_error: "Mes es requerido."}),
   year: z.string({ required_error: "Año es requerido."}),
-  comuna: z.string().min(1, 'Comuna es requerida.'),
+  comuna: z.string().optional(),
   instagram: z.string().optional(),
   celular: z.string().min(1, 'Celular es requerido.'),
 }).refine(data => {
@@ -168,7 +168,7 @@ export default function CompleteProfilePage() {
                             )} />
                         </div>
                     </div>
-                    <FormField control={form.control} name="comuna" render={({ field }) => (<FormItem><FormControl><Input placeholder="Comuna (Ej: Las Condes)" {...field} /></FormControl><FormMessage /></FormItem>)} />
+                    <FormField control={form.control} name="comuna" render={({ field }) => (<FormItem><FormControl><Input placeholder="Comuna (opcional)" {...field} /></FormControl><FormMessage /></FormItem>)} />
                     <div className="grid md:grid-cols-2 gap-4">
                         <FormField control={form.control} name="celular" render={({ field }) => (
                             <FormItem>

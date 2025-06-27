@@ -37,7 +37,7 @@ const loginSchema = z.object({
 const registerSchema = z.object({
   email: z.string().email('Email no válido.'),
   password: z.string().min(8, 'La contraseña debe tener al menos 8 caracteres.'),
-  promociones: z.boolean().default(false),
+  promociones: z.boolean().default(true),
 });
 
 export function AuthModal() {
@@ -58,7 +58,7 @@ export function AuthModal() {
     defaultValues: {
       email: '',
       password: '',
-      promociones: false,
+      promociones: true,
     },
     mode: 'onChange',
   });

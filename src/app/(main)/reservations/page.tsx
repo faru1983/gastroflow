@@ -36,7 +36,7 @@ const reservationSchema = z.object({
   year: z.string().optional(),
   comuna: z.string().optional(),
   instagram: z.string().optional(),
-  promociones: z.boolean().optional(),
+  promociones: z.boolean().default(true),
 }).refine(data => {
     if (!data.year || !data.month || !data.day) return true;
     const year = parseInt(data.year, 10);
@@ -78,7 +78,7 @@ export default function ReservationsPage() {
       celular: '',
       comuna: '',
       instagram: '',
-      promociones: false,
+      promociones: true,
     },
     mode: 'onChange',
   });
@@ -88,16 +88,16 @@ export default function ReservationsPage() {
         const [year, month, day] = user.fechaNacimiento?.split('-') || ['', '', ''];
         form.reset({
             ...form.getValues(),
-            nombre: user.nombre,
-            apellidos: user.apellidos,
-            email: user.email,
-            celular: user.celular,
+            nombre: user.nombre || '',
+            apellidos: user.apellidos || '',
+            email: user.email || '',
+            celular: user.celular || '',
             day: day || '',
             month: month || '',
             year: year || '',
             comuna: user.comuna || '',
             instagram: user.instagram || '',
-            promociones: user.promociones || false,
+            promociones: user.promociones,
         });
     }
   }, [user, form]);
@@ -145,6 +145,9 @@ export default function ReservationsPage() {
             description: `Gracias ${data.nombre}, tu mesa para ${data.people} ha sido reservada para el ${format(data.date, 'PPP', { locale: es })} a las ${data.time}.`,
         });
         form.reset();
+        if (isAuthenticated && user) {
+          prefillForm();
+        }
         setIsLoading(false);
     }, 1500);
   }
@@ -286,7 +289,7 @@ export default function ReservationsPage() {
                         )} />
                     </div>
                 </div>
-                <FormField control={form.control} name="comuna" render={({ field }) => (<FormItem><FormControl><Input placeholder="Comuna (Ej: Las Condes)" {...field} /></FormControl><FormMessage /></FormItem>)} />
+                <FormField control={form.control} name="comuna" render={({ field }) => (<FormItem><FormControl><Input placeholder="Comuna (opcional)" {...field} /></FormControl><FormMessage /></FormItem>)} />
                 <FormField control={form.control} name="instagram" render={({ field }) => (<FormItem><FormControl><Input placeholder="Instagram (opcional)" {...field} /></FormControl><FormMessage /></FormItem>)} />
                 <FormField
                   control={form.control}
