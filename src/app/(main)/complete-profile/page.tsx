@@ -37,7 +37,7 @@ const completeProfileSchema = z.object({
 
 const currentYear = new Date().getFullYear();
 const years = Array.from({ length: 100 }, (_, i) => currentYear - i);
-const months = Array.from({ length: 12 }, (_, i) => ({ value: (i + 1).toString(), label: new Date(2000, i, 1).toLocaleString('es-CL', { month: 'long' }) }));
+const months = Array.from({ length: 12 }, (_, i) => ({ value: (i + 1).toString(), label: (i + 1).toString().padStart(2, '0') }));
 const days = Array.from({ length: 31 }, (_, i) => (i + 1).toString());
 
 
@@ -75,7 +75,7 @@ export default function CompleteProfilePage() {
             nombre: user.nombre || '',
             apellidos: user.apellidos || '',
             day: day || undefined,
-            month: month || undefined,
+            month: month ? parseInt(month, 10).toString() : undefined,
             year: year || undefined,
             comuna: user.comuna || '',
             instagram: user.instagram || '',
@@ -87,10 +87,17 @@ export default function CompleteProfilePage() {
   const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>, fieldOnChange: (...event: any[]) => void) => {
     let value = e.target.value;
 
-    let numericValue = value.replace(/\D/g, '');
-    if (value.startsWith('+')) {
-        numericValue = value.substring(1).replace(/\D/g, '');
+    if (!value.startsWith('+')) {
+      value = '+' + value.replace(/\D/g, '');
+    } else {
+      value = '+' + value.substring(1).replace(/\D/g, '');
     }
+    
+    if (value === '+') {
+      value = '+569-';
+    }
+
+    let numericValue = value.substring(1).replace(/\D/g, '');
     
     if (numericValue.length > 11) {
         numericValue = numericValue.substring(0, 11);
@@ -110,7 +117,7 @@ export default function CompleteProfilePage() {
     setIsLoading(true);
     const { day, month, year, ...rest } = data;
     const fechaNacimiento = `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
-    updateUser({ ...rest, fechaNacimiento });
+    updateUser({ ...rest, fechaNacimiento, comuna: data.comuna || '' });
     toast({
         title: "¡Perfil completado!",
         description: "Tus datos han sido guardados exitosamente.",
@@ -142,7 +149,6 @@ export default function CompleteProfilePage() {
                         <FormField control={form.control} name="apellidos" render={({ field }) => (<FormItem><FormControl><Input placeholder="Apellidos" {...field} /></FormControl><FormMessage /></FormItem>)} />
                     </div>
                      <div className="space-y-2">
-                        <p className="text-sm font-medium text-muted-foreground">Fecha de Nacimiento</p>
                         <div className="grid grid-cols-3 gap-4">
                             <FormField control={form.control} name="day" render={({ field }) => (
                                 <FormItem>

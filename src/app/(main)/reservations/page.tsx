@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useForm } from 'react-hook-form';
@@ -58,23 +57,23 @@ const timeSlots = Array.from({ length: 9 }, (_, i) => {
 
 const currentYear = new Date().getFullYear();
 const years = Array.from({ length: 100 }, (_, i) => currentYear - i);
-const months = Array.from({ length: 12 }, (_, i) => ({ value: (i + 1).toString(), label: new Date(2000, i, 1).toLocaleString('es-CL', { month: 'long' }) }));
+const months = Array.from({ length: 12 }, (_, i) => ({ value: (i + 1).toString(), label: (i + 1).toString().padStart(2, '0') }));
 const days = Array.from({ length: 31 }, (_, i) => (i + 1).toString());
 
 const defaultValues = {
   date: undefined,
-  time: undefined,
+  time: '',
   people: undefined,
-  preference: undefined,
-  reason: undefined,
+  preference: '',
+  reason: '',
   comments: '',
   nombre: '',
   apellidos: '',
   email: '',
   celular: '+569-',
-  day: undefined,
-  month: undefined,
-  year: undefined,
+  day: '',
+  month: '',
+  year: '',
   comuna: '',
   instagram: '',
   promociones: true,
@@ -101,9 +100,9 @@ export default function ReservationsPage() {
             apellidos: user.apellidos || '',
             email: user.email || '',
             celular: user.celular || '+569-',
-            day: day || undefined,
-            month: month || undefined,
-            year: year || undefined,
+            day: day || '',
+            month: month ? parseInt(month, 10).toString() : '',
+            year: year || '',
             comuna: user.comuna || '',
             instagram: user.instagram || '',
             promociones: user.promociones ?? true,
@@ -165,22 +164,23 @@ export default function ReservationsPage() {
             title: '¡Reserva Confirmada!',
             description: `Gracias ${data.nombre}, tu mesa para ${data.people} ha sido reservada para el ${format(data.date, 'PPP', { locale: es })} a las ${data.time}.`,
         });
-
-        const resetValues = { ...defaultValues };
+        
+        const newDefaultValues = {...defaultValues};
         if (isAuthenticated && user) {
             const [year, month, day] = user.fechaNacimiento?.split('-') || [];
-            resetValues.nombre = user.nombre || '';
-            resetValues.apellidos = user.apellidos || '';
-            resetValues.email = user.email || '';
-            resetValues.celular = user.celular || '+569-';
-            resetValues.day = day || undefined;
-            resetValues.month = month || undefined;
-            resetValues.year = year || undefined;
-            resetValues.comuna = user.comuna || '';
-            resetValues.instagram = user.instagram || '';
-            resetValues.promociones = user.promociones ?? true;
+            newDefaultValues.nombre = user.nombre || '';
+            newDefaultValues.apellidos = user.apellidos || '';
+            newDefaultValues.email = user.email || '';
+            newDefaultValues.celular = user.celular || '+569-';
+            newDefaultValues.day = day || '';
+            newDefaultValues.month = month ? parseInt(month, 10).toString() : '';
+            newDefaultValues.year = year || '';
+            newDefaultValues.comuna = user.comuna || '';
+            newDefaultValues.instagram = user.instagram || '';
+            newDefaultValues.promociones = user.promociones ?? true;
         }
-        form.reset(resetValues);
+
+        form.reset(newDefaultValues);
 
         setIsLoading(false);
     }, 1500);
@@ -210,7 +210,7 @@ export default function ReservationsPage() {
                                 </FormControl>
                                 </PopoverTrigger>
                                 <PopoverContent className="w-auto p-0" align="start">
-                                    <Calendar mode="single" selected={field.value} onSelect={(date) => { field.onChange(date); setIsCalendarOpen(false); }} disabled={(date) => date < new Date(new Date().setHours(0,0,0,0))} initialFocus/>
+                                    <Calendar mode="single" selected={field.value} onSelect={(date) => { if (date) {field.onChange(date)}; setIsCalendarOpen(false); }} disabled={(date) => date < new Date(new Date().setHours(0,0,0,0))} initialFocus/>
                                 </PopoverContent>
                             </Popover>
                             <FormMessage />
@@ -292,7 +292,6 @@ export default function ReservationsPage() {
                     )} />
                 </div>
                  <div className="space-y-2">
-                    <Label>Fecha de Nacimiento</Label>
                     <div className="grid grid-cols-3 gap-4">
                         <FormField control={form.control} name="day" render={({ field }) => (
                             <FormItem>

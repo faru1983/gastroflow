@@ -44,7 +44,7 @@ function LoggedInView() {
     
     const currentYear = new Date().getFullYear();
     const years = Array.from({ length: 100 }, (_, i) => currentYear - i);
-    const months = Array.from({ length: 12 }, (_, i) => ({ value: (i + 1).toString(), label: new Date(2000, i, 1).toLocaleString('es-CL', { month: 'long' }) }));
+    const months = Array.from({ length: 12 }, (_, i) => ({ value: (i + 1).toString(), label: (i + 1).toString().padStart(2, '0') }));
     const days = Array.from({ length: 31 }, (_, i) => (i + 1).toString());
 
     const [formData, setFormData] = useState({
@@ -70,7 +70,7 @@ function LoggedInView() {
                 nombre: user.nombre || '',
                 apellidos: user.apellidos || '',
                 day: day || undefined,
-                month: month || undefined,
+                month: month ? parseInt(month, 10).toString() : undefined,
                 year: year || undefined,
                 comuna: user.comuna || '',
                 instagram: user.instagram || '',
@@ -91,10 +91,17 @@ function LoggedInView() {
     const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         let value = e.target.value;
 
-        let numericValue = value.replace(/\D/g, '');
-        if (value.startsWith('+')) {
-            numericValue = value.substring(1).replace(/\D/g, '');
+        if (!value.startsWith('+')) {
+            value = '+' + value.replace(/\D/g, '');
+        } else {
+            value = '+' + value.substring(1).replace(/\D/g, '');
         }
+        
+        if (value === '+') {
+            value = '+569-';
+        }
+
+        let numericValue = value.substring(1).replace(/\D/g, '');
         
         if (numericValue.length > 11) {
             numericValue = numericValue.substring(0, 11);
@@ -128,7 +135,7 @@ function LoggedInView() {
         }
         
         const fechaNacimiento = (year && month && day) ? `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}` : undefined;
-        updateUser({ ...rest, fechaNacimiento });
+        updateUser({ ...rest, fechaNacimiento, comuna: formData.comuna || '' });
         setIsEditing(false);
         toast({ title: "¡Éxito!", description: "Tu información ha sido actualizada correctamente." });
     }
@@ -154,7 +161,6 @@ function LoggedInView() {
                     </div>
                     
                     <div className="space-y-2">
-                        <Label>Fecha de Nacimiento</Label>
                         <div className="grid grid-cols-3 gap-4">
                              <Select onValueChange={(value) => handleSelectChange('day', value)} value={formData.day} disabled={!isEditing}>
                                 <SelectTrigger><SelectValue placeholder="Día" /></SelectTrigger>
@@ -178,7 +184,7 @@ function LoggedInView() {
                         <Input name="instagram" placeholder="Instagram (opcional)" value={formData.instagram} onChange={handleInputChange} disabled={!isEditing} />
                     </div>
                     
-                    <Input name="email" type="email" placeholder="Email" value={formData.email} onChange={handleInputChange} disabled={!isEditing} />
+                    <Input name="email" type="email" placeholder="Email" value={formData.email} onChange={handleInputChange} disabled={true} />
 
                     {isEditing && (
                         <>
@@ -201,40 +207,42 @@ function LoggedInView() {
                             </div>
                             
                             <Separator/>
-
-                             <div className="space-y-4 pt-4">
-                                 <h3 className="text-lg font-semibold text-destructive">Zona de Peligro</h3>
-                                 <AlertDialog>
-                                    <AlertDialogTrigger asChild>
-                                        <Button variant="destructive">Eliminar Cuenta</Button>
-                                    </AlertDialogTrigger>
-                                    <AlertDialogContent>
-                                        <AlertDialogHeader>
-                                        <AlertDialogTitle>¿Estás seguro?</AlertDialogTitle>
-                                        <AlertDialogDescription>
-                                            Esta acción no se puede deshacer. Para confirmar, escribe "Eliminar" en el campo de abajo.
-                                        </AlertDialogDescription>
-                                        </AlertDialogHeader>
-                                        <Input value={deleteConfirmText} onChange={(e) => setDeleteConfirmText(e.target.value)} placeholder='Eliminar'/>
-                                        <AlertDialogFooter>
-                                        <AlertDialogCancel onClick={() => setDeleteConfirmText("")}>Cancelar</AlertDialogCancel>
-                                        <AlertDialogAction disabled={deleteConfirmText !== 'Eliminar'} onClick={logout}>Confirmar</AlertDialogAction>
-                                        </AlertDialogFooter>
-                                    </AlertDialogContent>
-                                </AlertDialog>
-                                <p className="text-sm text-muted-foreground">Esta acción es permanente y eliminará todos tus datos, visitas y beneficios asociados.</p>
-                            </div>
                         </>
                     )}
                 </CardContent>
-                <CardFooter>
-                    {isEditing ? (
+                 <CardFooter className="flex-col items-start gap-4">
+                     {isEditing ? (
                         <div className="flex gap-2">
                             <Button onClick={handleUpdate} className="bg-green-600 hover:bg-green-700 text-primary-foreground">Guardar Cambios</Button>
                             <Button variant="ghost" onClick={() => { setIsEditing(false); setDeleteConfirmText(""); }}>Cancelar</Button>
                         </div>
                     ) : (
                         <Button onClick={() => setIsEditing(true)} className="bg-green-600 hover:bg-green-700 text-primary-foreground">Actualizar Datos</Button>
+                    )}
+                    
+                    {isEditing && (
+                         <div className="space-y-4 pt-4 w-full border-t mt-4">
+                             <h3 className="text-lg font-semibold text-destructive">Zona de Peligro</h3>
+                             <AlertDialog>
+                                <AlertDialogTrigger asChild>
+                                    <Button variant="destructive">Eliminar Cuenta</Button>
+                                </AlertDialogTrigger>
+                                <AlertDialogContent>
+                                    <AlertDialogHeader>
+                                    <AlertDialogTitle>¿Estás seguro?</AlertDialogTitle>
+                                    <AlertDialogDescription>
+                                        Esta acción no se puede deshacer. Para confirmar, escribe "Eliminar" en el campo de abajo.
+                                    </AlertDialogDescription>
+                                    </AlertDialogHeader>
+                                    <Input value={deleteConfirmText} onChange={(e) => setDeleteConfirmText(e.target.value)} placeholder='Eliminar'/>
+                                    <AlertDialogFooter>
+                                    <AlertDialogCancel onClick={() => setDeleteConfirmText("")}>Cancelar</AlertDialogCancel>
+                                    <AlertDialogAction disabled={deleteConfirmText !== 'Eliminar'} onClick={logout}>Confirmar</AlertDialogAction>
+                                    </AlertDialogFooter>
+                                </AlertDialogContent>
+                            </AlertDialog>
+                            <p className="text-sm text-muted-foreground">Esta acción es permanente y eliminará todos tus datos, visitas y beneficios asociados.</p>
+                        </div>
                     )}
                 </CardFooter>
             </Card>
