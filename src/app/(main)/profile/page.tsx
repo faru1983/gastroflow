@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useAuth } from '@/contexts/auth-context';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
@@ -13,6 +13,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { mockReservations, mockVisits } from '@/lib/data';
 import { useToast } from '@/hooks/use-toast';
 import { Badge } from '@/components/ui/badge';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 function LoggedOutView() {
     const { showAuthModal } = useAuth();
@@ -41,30 +42,59 @@ function LoggedInView() {
     const [deleteConfirmText, setDeleteConfirmText] = useState("");
     const { toast } = useToast();
     
-    // Local state for form fields to not affect context until save
+    const currentYear = new Date().getFullYear();
+    const years = Array.from({ length: 100 }, (_, i) => currentYear - i);
+    const months = Array.from({ length: 12 }, (_, i) => ({ value: (i + 1).toString(), label: new Date(2000, i, 1).toLocaleString('es-CL', { month: 'long' }) }));
+    const days = Array.from({ length: 31 }, (_, i) => (i + 1).toString());
+
     const [formData, setFormData] = useState({
-        ...user,
         nombre: user?.nombre || '',
         apellidos: user?.apellidos || '',
-        fechaNacimiento: user?.fechaNacimiento || '',
+        day: user?.fechaNacimiento?.split('-')[2] || '',
+        month: user?.fechaNacimiento?.split('-')[1] || '',
+        year: user?.fechaNacimiento?.split('-')[0] || '',
         comuna: user?.comuna || '',
         instagram: user?.instagram || '',
+        email: user?.email || '',
         celular: user?.celular || '',
+        promociones: user?.promociones || false,
     });
 
+    useEffect(() => {
+        if(user) {
+            const [year, month, day] = user.fechaNacimiento?.split('-') || ['', '', ''];
+            setFormData({
+                nombre: user.nombre || '',
+                apellidos: user.apellidos || '',
+                day: day || '',
+                month: month || '',
+                year: year || '',
+                comuna: user.comuna || '',
+                instagram: user.instagram || '',
+                email: user.email || '',
+                celular: user.celular || '',
+                promociones: user.promociones || false,
+            });
+        }
+    }, [user, isEditing]);
+
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setFormData({ ...formData!, [e.target.name]: e.target.value });
+        setFormData({ ...formData, [e.target.name]: e.target.value });
+    };
+
+    const handleSelectChange = (name: string, value: string) => {
+        setFormData({ ...formData, [name]: value });
     };
 
     const handleUpdate = () => {
-        if (formData) {
-            updateUser(formData);
-        }
+        const { day, month, year, ...rest } = formData;
+        const fechaNacimiento = (year && month && day) ? `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}` : undefined;
+        updateUser({ ...rest, fechaNacimiento });
         setIsEditing(false);
         toast({ title: "Datos actualizados", description: "Tu información ha sido guardada." });
     }
 
-    if (!user || !formData) return null;
+    if (!user) return null;
 
     return (
         <div className="space-y-8">
@@ -78,17 +108,40 @@ function LoggedInView() {
                     <CardTitle>Mis Datos</CardTitle>
                     <CardDescription>Aquí puedes ver y actualizar tu información personal.</CardDescription>
                 </CardHeader>
-                <CardContent className="space-y-4">
+                <CardContent className="space-y-6">
                     <div className="grid md:grid-cols-2 gap-4">
-                        <div><Label>Nombre</Label><Input name="nombre" value={formData.nombre || ''} onChange={handleInputChange} disabled={!isEditing} /></div>
-                        <div><Label>Apellidos</Label><Input name="apellidos" value={formData.apellidos || ''} onChange={handleInputChange} disabled={!isEditing} /></div>
-                        <div><Label>Fecha de Nacimiento</Label><Input name="fechaNacimiento" type="date" value={formData.fechaNacimiento || ''} onChange={handleInputChange} disabled={!isEditing} /></div>
-                        <div><Label>Comuna</Label><Input name="comuna" value={formData.comuna || ''} onChange={handleInputChange} disabled={!isEditing} /></div>
-                        <div><Label>Instagram</Label><Input name="instagram" value={formData.instagram || ''} onChange={handleInputChange} disabled={!isEditing} /></div>
-                        <div><Label>Email</Label><Input name="email" type="email" value={formData.email || ''} onChange={handleInputChange} disabled={!isEditing} /></div>
-                        <div><Label>Celular</Label><Input name="celular" value={formData.celular || ''} onChange={handleInputChange} disabled={!isEditing} /></div>
+                        <Input name="nombre" placeholder="Nombre" value={formData.nombre} onChange={handleInputChange} disabled={!isEditing} />
+                        <Input name="apellidos" placeholder="Apellidos" value={formData.apellidos} onChange={handleInputChange} disabled={!isEditing} />
                     </div>
-                     {isEditing && (
+                    
+                    <div className="space-y-2">
+                        <p className="text-sm font-medium text-muted-foreground">Fecha de Nacimiento</p>
+                        <div className="grid grid-cols-3 gap-4">
+                             <Select onValueChange={(value) => handleSelectChange('day', value)} value={formData.day} disabled={!isEditing}>
+                                <SelectTrigger><SelectValue placeholder="Día" /></SelectTrigger>
+                                <SelectContent>{days.map(d => <SelectItem key={d} value={d}>{d}</SelectItem>)}</SelectContent>
+                            </Select>
+                            <Select onValueChange={(value) => handleSelectChange('month', value)} value={formData.month} disabled={!isEditing}>
+                                <SelectTrigger><SelectValue placeholder="Mes" /></SelectTrigger>
+                                <SelectContent>{months.map(m => <SelectItem key={m.value} value={m.value}>{m.label}</SelectItem>)}</SelectContent>
+                            </Select>
+                            <Select onValueChange={(value) => handleSelectChange('year', value)} value={formData.year} disabled={!isEditing}>
+                                <SelectTrigger><SelectValue placeholder="Año" /></SelectTrigger>
+                                <SelectContent>{years.map(y => <SelectItem key={y} value={y.toString()}>{y}</SelectItem>)}</SelectContent>
+                            </Select>
+                        </div>
+                    </div>
+
+                    <Input name="comuna" placeholder="Comuna (Ej: Las Condes)" value={formData.comuna} onChange={handleInputChange} disabled={!isEditing} />
+                    
+                    <div className="grid md:grid-cols-2 gap-4">
+                        <Input name="celular" placeholder="Celular (Ej: +569...)" value={formData.celular} onChange={handleInputChange} disabled={!isEditing} />
+                        <Input name="instagram" placeholder="Instagram (opcional)" value={formData.instagram} onChange={handleInputChange} disabled={!isEditing} />
+                    </div>
+                    
+                    <Input name="email" type="email" placeholder="Email" value={formData.email} onChange={handleInputChange} disabled={!isEditing} />
+
+                    {isEditing && (
                         <>
                             <Separator className="my-6"/>
                             <div className="space-y-4">
@@ -122,7 +175,7 @@ function LoggedInView() {
                     {isEditing ? (
                         <div className="flex gap-2">
                             <Button onClick={handleUpdate}>Guardar Cambios</Button>
-                            <Button variant="ghost" onClick={() => { setIsEditing(false); setFormData({...user, nombre: user?.nombre || ''});}}>Cancelar</Button>
+                            <Button variant="ghost" onClick={() => setIsEditing(false)}>Cancelar</Button>
                         </div>
                     ) : (
                         <Button onClick={() => setIsEditing(true)}>Actualizar Datos</Button>
