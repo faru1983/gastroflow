@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useEffect, useState } from 'react';
@@ -134,6 +135,11 @@ function LoggedInView() {
                 return;
             }
         }
+        
+        if (formData.celular && formData.celular.replace(/\D/g, '').length !== 11) {
+            toast({ variant: "destructive", title: "Error", description: "El celular debe tener 11 dígitos en total." });
+            return;
+        }
 
         if (fechaNacimiento) {
              if (!/^\d{2}-\d{2}-\d{4}$/.test(fechaNacimiento)) {
@@ -176,11 +182,11 @@ function LoggedInView() {
                     
                     <Input name="fechaNacimiento" placeholder="Fecha de Nacimiento (DD-MM-YYYY)" value={formData.fechaNacimiento} onChange={handleDateChange} disabled={!isEditing} />
                     
-                    <Input name="comuna" placeholder="Comuna (opcional)" value={formData.comuna} onChange={handleInputChange} disabled={!isEditing} />
+                    <Input name="comuna" placeholder="Comuna" value={formData.comuna} onChange={handleInputChange} disabled={!isEditing} />
                     
                     <div className="grid md:grid-cols-2 gap-4">
                         <Input name="celular" placeholder="Celular (Ej: +569-xxxxxxxx)" value={formData.celular} onChange={handlePhoneChange} disabled={!isEditing} />
-                        <Input name="instagram" placeholder="Instagram (opcional)" value={formData.instagram} onChange={handleInputChange} disabled={!isEditing} />
+                        <Input name="instagram" placeholder="Instagram" value={formData.instagram} onChange={handleInputChange} disabled={!isEditing} />
                     </div>
                     
                     <Input name="email" type="email" placeholder="Email" value={formData.email} onChange={handleInputChange} disabled={true} />

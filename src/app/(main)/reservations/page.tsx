@@ -23,14 +23,14 @@ import { Switch } from '@/components/ui/switch';
 const reservationSchema = z.object({
   date: z.date({ required_error: 'La fecha es requerida.' }),
   time: z.string().min(1, 'La hora es requerida.'),
-  people: z.coerce.number().min(1, "Debe seleccionar al menos 1 persona.").max(8, "Máximo 8 personas."),
+  people: z.coerce.number({ invalid_type_error: "Debes seleccionar la cantidad de personas." }).min(1, "Debe seleccionar al menos 1 persona.").max(8, "Máximo 8 personas."),
   preference: z.string().min(1, 'La preferencia es requerida.'),
   reason: z.string().min(1, 'El motivo es requerido.'),
   comments: z.string().optional(),
   nombre: z.string().min(1, 'Nombre es requerido.'),
   apellidos: z.string().min(1, 'Apellidos son requeridos.'),
   email: z.string().email('Email no válido.'),
-  celular: z.string().min(1, 'Celular es requerido.'),
+  celular: z.string().min(1, 'Celular es requerido.').refine(val => val.replace(/\D/g, '').length === 11, { message: 'El celular debe tener 11 dígitos en total.' }),
   fechaNacimiento: z.string().optional().or(z.literal("")).refine((val) => {
     if (!val) return true;
     if (!/^\d{2}-\d{2}-\d{4}$/.test(val)) return false;
@@ -172,6 +172,9 @@ export default function ReservationsPage() {
             ...defaultValues,
             date: undefined,
             people: undefined,
+            time: '',
+            preference: '',
+            reason: '',
         };
 
         if (isAuthenticated && user) {
@@ -312,8 +315,8 @@ export default function ReservationsPage() {
                         </FormItem>
                     )}
                 />
-                <FormField control={form.control} name="comuna" render={({ field }) => (<FormItem><FormControl><Input placeholder="Comuna (opcional)" {...field} /></FormControl><FormMessage /></FormItem>)} />
-                <FormField control={form.control} name="instagram" render={({ field }) => (<FormItem><FormControl><Input placeholder="Instagram (opcional)" {...field} /></FormControl><FormMessage /></FormItem>)} />
+                <FormField control={form.control} name="comuna" render={({ field }) => (<FormItem><FormControl><Input placeholder="Comuna" {...field} /></FormControl><FormMessage /></FormItem>)} />
+                <FormField control={form.control} name="instagram" render={({ field }) => (<FormItem><FormControl><Input placeholder="Instagram" {...field} /></FormControl><FormMessage /></FormItem>)} />
                 <FormField
                   control={form.control}
                   name="promociones"
@@ -333,7 +336,7 @@ export default function ReservationsPage() {
                 />
             </div>
 
-            <Button type="submit" className="w-full text-lg py-6 bg-accent text-accent-foreground hover:bg-accent/90" disabled={isLoading}>
+            <Button type="submit" className="w-full text-lg py-6 bg-accent text-accent-foreground hover:bg-accent/90">
               {isLoading ? <Loader2 className="animate-spin" /> : 'Reservar'}
             </Button>
         </form>

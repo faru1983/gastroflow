@@ -25,7 +25,7 @@ const completeProfileSchema = z.object({
   }, { message: "Fecha no válida." }),
   comuna: z.string().optional(),
   instagram: z.string().optional(),
-  celular: z.string().min(1, 'Celular es requerido.'),
+  celular: z.string().min(1, 'Celular es requerido.').refine(val => val.replace(/\D/g, '').length === 11, { message: 'El celular debe tener 11 dígitos en total.' }),
 });
 
 export default function CompleteProfilePage() {
@@ -165,7 +165,7 @@ export default function CompleteProfilePage() {
                             </FormItem>
                         )}
                     />
-                    <FormField control={form.control} name="comuna" render={({ field }) => (<FormItem><FormControl><Input placeholder="Comuna (opcional)" {...field} /></FormControl><FormMessage /></FormItem>)} />
+                    <FormField control={form.control} name="comuna" render={({ field }) => (<FormItem><FormControl><Input placeholder="Comuna" {...field} /></FormControl><FormMessage /></FormItem>)} />
                     <div className="grid md:grid-cols-2 gap-4">
                         <FormField control={form.control} name="celular" render={({ field }) => (
                             <FormItem>
@@ -175,9 +175,9 @@ export default function CompleteProfilePage() {
                                 <FormMessage />
                             </FormItem>
                         )} />
-                        <FormField control={form.control} name="instagram" render={({ field }) => (<FormItem><FormControl><Input placeholder="Instagram (opcional)" {...field} /></FormControl><FormMessage /></FormItem>)} />
+                        <FormField control={form.control} name="instagram" render={({ field }) => (<FormItem><FormControl><Input placeholder="Instagram" {...field} /></FormControl><FormMessage /></FormItem>)} />
                     </div>
-                    <Button type="submit" className="w-full bg-accent text-accent-foreground hover:bg-accent/90" disabled={isLoading}>
+                    <Button type="submit" className="w-full bg-accent text-accent-foreground hover:bg-accent/90">
                         {isLoading ? <Loader2 className="animate-spin" /> : 'Guardar y continuar'}
                     </Button>
                 </form>
