@@ -9,7 +9,7 @@ interface AuthContextType {
   user: User | null;
   isAuthenticated: boolean;
   isAuthModalOpen: boolean;
-  showAuthModal: (onSuccess?: () => void) => void;
+  showAuthModal: (options?: { onLoginSuccess?: () => void; onRegisterSuccess?: () => void }) => void;
   closeAuthModal: () => void;
   login: (email: string, pass: string) => Promise<{ success: boolean; callbackHandled: boolean }>;
   logout: () => void;
@@ -23,10 +23,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [isAuthModalOpen, setAuthModalOpen] = useState(false);
   const [onLoginSuccess, setOnLoginSuccess] = useState<(() => void) | null>(null);
+  const [onRegisterSuccess, setOnRegisterSuccess] = useState<(() => void) | null>(null);
 
-  const showAuthModal = (onSuccess?: () => void) => {
-    if (onSuccess) {
-      setOnLoginSuccess(() => onSuccess);
+  const showAuthModal = (options?: { onLoginSuccess?: () => void; onRegisterSuccess?: () => void }) => {
+    if (options?.onLoginSuccess) {
+      setOnLoginSuccess(() => options.onLoginSuccess);
+    }
+    if (options?.onRegisterSuccess) {
+      setOnRegisterSuccess(() => options.onRegisterSuccess);
     }
     setAuthModalOpen(true);
   };
@@ -34,6 +38,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const closeAuthModal = () => {
     setAuthModalOpen(false);
     setOnLoginSuccess(null);
+    setOnRegisterSuccess(null);
   };
 
   const login = async (email: string, pass: string): Promise<{ success: boolean; callbackHandled: boolean }> => {
@@ -74,9 +79,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         };
         setUser(newUser);
         closeAuthModal();
-         if (onLoginSuccess) {
-            onLoginSuccess();
-            setOnLoginSuccess(null);
+         if (onRegisterSuccess) {
+            onRegisterSuccess();
+            setOnRegisterSuccess(null);
             resolve({ success: true, callbackHandled: true });
           } else {
             resolve({ success: true, callbackHandled: false });

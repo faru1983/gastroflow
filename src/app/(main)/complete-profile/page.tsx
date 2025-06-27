@@ -10,7 +10,7 @@ import { Form, FormControl, FormField, FormItem, FormMessage } from '@/component
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/auth-context';
 import { Loader2 } from 'lucide-react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 
@@ -32,6 +32,7 @@ export default function CompleteProfilePage() {
   const { toast } = useToast();
   const { user, updateUser, isAuthenticated } = useAuth();
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [isLoading, setIsLoading] = useState(false);
 
   const form = useForm<z.infer<typeof completeProfileSchema>>({
@@ -123,7 +124,13 @@ export default function CompleteProfilePage() {
         title: "¡Perfil completado!",
         description: "Tus datos han sido guardados exitosamente.",
     });
-    router.push('/profile');
+
+    const redirectUrl = searchParams.get('redirect');
+    if (redirectUrl) {
+      router.push(redirectUrl);
+    } else {
+      router.push('/profile');
+    }
     setIsLoading(false);
   }
 

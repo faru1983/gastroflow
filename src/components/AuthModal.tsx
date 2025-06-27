@@ -27,7 +27,7 @@ import {
 } from '@/components/ui/form';
 import { useToast } from '@/hooks/use-toast';
 import { Loader2 } from 'lucide-react';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import { Switch } from './ui/switch';
 
 const loginSchema = z.object({
@@ -47,6 +47,7 @@ export function AuthModal() {
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
   const router = useRouter();
+  const pathname = usePathname();
 
   const loginForm = useForm<z.infer<typeof loginSchema>>({
     resolver: zodResolver(loginSchema),
@@ -88,7 +89,8 @@ export function AuthModal() {
       });
     } else {
        if (!result.callbackHandled) {
-        router.push('/complete-profile');
+        const redirectParam = pathname === '/reservations' ? `?redirect=${pathname}` : '';
+        router.push(`/complete-profile${redirectParam}`);
       }
     }
     setIsLoading(false);

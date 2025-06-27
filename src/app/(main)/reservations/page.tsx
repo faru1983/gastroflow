@@ -80,10 +80,11 @@ export default function ReservationsPage() {
     mode: 'onChange',
   });
 
-  const prefillForm = useCallback(() => {
+  const prefillForm = useCallback((pendingData: any = {}) => {
     if (user) {
         form.reset({
             ...form.getValues(),
+            ...pendingData,
             nombre: user.nombre || '',
             apellidos: user.apellidos || '',
             email: user.email || '',
@@ -97,10 +98,21 @@ export default function ReservationsPage() {
   }, [user, form]);
 
   useEffect(() => {
-    if (isAuthenticated && user) {
+    const pendingReservationJSON = localStorage.getItem('pendingReservation');
+    if (pendingReservationJSON && isAuthenticated) {
+        const data = JSON.parse(pendingReservationJSON);
+        if (data.date) {
+            data.date = new Date(data.date);
+        }
+        prefillForm(data);
+        localStorage.removeItem('pendingReservation');
+        setStep(3);
+        toast({ title: '¡Bienvenido!', description: 'Continúa con tu reserva.' });
+    } else if (isAuthenticated) {
         prefillForm();
     }
-  }, [isAuthenticated, user, prefillForm]);
+  }, [isAuthenticated, user, prefillForm, form, toast]);
+
 
   const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>, fieldOnChange: (...event: any[]) => void) => {
     let value = e.target.value;
@@ -152,9 +164,22 @@ export default function ReservationsPage() {
   };
 
   const handleLogin = () => {
-    showAuthModal(() => {
-      toast({ title: '¡Bienvenido!', description: 'Tus datos han sido cargados en el formulario.' });
-      setStep(3);
+    const reservationData = form.getValues();
+    if (reservationData.date && reservationData.time && reservationData.people) {
+      localStorage.setItem('pendingReservation', JSON.stringify({
+        date: reservationData.date,
+        time: reservationData.time,
+        people: reservationData.people,
+        preference: reservationData.preference,
+        reason: reservationData.reason,
+        comments: reservationData.comments,
+      }));
+    }
+    showAuthModal({
+      onLoginSuccess: () => {
+        toast({ title: '¡Bienvenido!', description: 'Tus datos han sido cargados en el formulario.' });
+        setStep(3);
+      },
     });
   };
 
@@ -174,6 +199,7 @@ export default function ReservationsPage() {
             time: '',
             preference: '',
             reason: '',
+            comments: '',
         };
 
         if (isAuthenticated && user) {
