@@ -20,6 +20,8 @@ import { es } from 'date-fns/locale';
 import { useEffect, useState, useCallback } from 'react';
 import { Switch } from '@/components/ui/switch';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Label } from '@/components/ui/label';
+import type { User } from '@/lib/types';
 
 const reservationSchema = z.object({
   date: z.date({ required_error: 'La fecha es requerida.' }),
@@ -99,7 +101,8 @@ export default function ReservationsPage() {
 
   useEffect(() => {
     const pendingReservationJSON = localStorage.getItem('pendingReservation');
-    if (pendingReservationJSON && isAuthenticated) {
+    if (pendingReservationJSON) {
+      if (isAuthenticated) {
         const data = JSON.parse(pendingReservationJSON);
         if (data.date) {
             data.date = new Date(data.date);
@@ -108,6 +111,7 @@ export default function ReservationsPage() {
         localStorage.removeItem('pendingReservation');
         setStep(3);
         toast({ title: '¡Bienvenido!', description: 'Continúa con tu reserva.' });
+      }
     } else if (isAuthenticated) {
         prefillForm();
     }
@@ -165,16 +169,16 @@ export default function ReservationsPage() {
 
   const handleLogin = () => {
     const reservationData = form.getValues();
-    if (reservationData.date && reservationData.time && reservationData.people) {
-      localStorage.setItem('pendingReservation', JSON.stringify({
-        date: reservationData.date,
-        time: reservationData.time,
-        people: reservationData.people,
-        preference: reservationData.preference,
-        reason: reservationData.reason,
-        comments: reservationData.comments,
-      }));
-    }
+    // Save reservation data to localStorage before showing the auth modal
+    localStorage.setItem('pendingReservation', JSON.stringify({
+      date: reservationData.date,
+      time: reservationData.time,
+      people: reservationData.people,
+      preference: reservationData.preference,
+      reason: reservationData.reason,
+      comments: reservationData.comments,
+    }));
+    
     showAuthModal({
       onLoginSuccess: () => {
         toast({ title: '¡Bienvenido!', description: 'Tus datos han sido cargados en el formulario.' });
@@ -194,12 +198,9 @@ export default function ReservationsPage() {
         
         const newDefaultValues: z.infer<typeof reservationSchema> | {} = {
             ...defaultValues,
-            date: undefined,
-            people: undefined,
             time: '',
             preference: '',
             reason: '',
-            comments: '',
         };
 
         if (isAuthenticated && user) {
@@ -240,17 +241,17 @@ export default function ReservationsPage() {
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-2xl">
-      <header className="mb-8">
-        <div className="flex justify-between items-center">
-            <h1 className="text-4xl font-headline">Haz tu Reserva</h1>
-            {isAuthenticated && (
-                <Button variant="link" onClick={logout}>
-                    Cerrar Sesión
-                </Button>
-            )}
-        </div>
-        <p className="text-muted-foreground">Asegura tu lugar en nuestra mesa.</p>
-      </header>
+        <header className="mb-8">
+            <div className="flex justify-between items-center">
+                <h1 className="text-4xl font-headline">Haz tu Reserva</h1>
+                {isAuthenticated && (
+                    <Button variant="link" onClick={logout}>
+                        Cerrar Sesión
+                    </Button>
+                )}
+            </div>
+            <p className="text-muted-foreground">Asegura tu lugar en nuestra mesa.</p>
+        </header>
       
       {Stepper}
       
@@ -326,7 +327,6 @@ export default function ReservationsPage() {
                                         <SelectItem value="Cita">Cita</SelectItem>
                                         <SelectItem value="Negocios">Negocios</SelectItem>
                                     </SelectContent>
-                                </Select>
                                 <FormMessage />
                             </FormItem>
                         )} />
@@ -400,7 +400,7 @@ export default function ReservationsPage() {
                         <FormField control={form.control} name="promociones" render={({ field }) => (
                             <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3">
                                 <div className="space-y-0.5">
-                                    <p>Suscribirse a mensajes promocionales</p>
+                                    <Label>Suscribirse a mensajes promocionales</Label>
                                 </div>
                                 <FormControl>
                                     <Switch checked={field.value} onCheckedChange={field.onChange} />
@@ -421,3 +421,5 @@ export default function ReservationsPage() {
     </div>
   );
 }
+
+    
