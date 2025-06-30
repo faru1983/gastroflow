@@ -40,14 +40,14 @@ const registerSchema = z.object({
   password: z.string().min(8, 'La contraseña debe tener al menos 8 caracteres.'),
   nombre: z.string().min(1, 'Nombre es requerido.'),
   apellidos: z.string().min(1, 'Apellidos son requeridos.'),
-  fechaNacimiento: z.string().min(1, 'Fecha de nacimiento es requerida.').refine(val => {
-      if (!val) return true;
-      if (!/^\d{2}-\d{2}-\d{4}$/.test(val)) return false;
-      const [day, month, year] = val.split('-').map(Number);
-      const date = new Date(year, month - 1, day);
-      return date.getFullYear() === year && date.getMonth() === month - 1 && date.getDate() === day;
-  }, { message: "Fecha no válida. Usa el formato DD-MM-YYYY." }),
   celular: z.string().min(1, 'Celular es requerido.').refine(val => val.replace(/\D/g, '').length === 11, { message: 'El celular debe tener 11 dígitos en total.' }),
+  fechaNacimiento: z.string().optional().or(z.literal("")).refine((val) => {
+    if (!val) return true;
+    if (!/^\d{2}-\d{2}-\d{4}$/.test(val)) return false;
+    const [day, month, year] = val.split('-').map(Number);
+    const date = new Date(year, month - 1, day);
+    return date.getFullYear() === year && date.getMonth() === month - 1 && date.getDate() === day;
+  }, { message: "Fecha no válida. Usa el formato DD-MM-YYYY." }),
   comuna: z.string().optional(),
   instagram: z.string().optional(),
   promociones: z.boolean().default(true),
@@ -73,8 +73,8 @@ export function AuthModal() {
       password: '',
       nombre: '',
       apellidos: '',
-      fechaNacimiento: '',
       celular: '+569-',
+      fechaNacimiento: '',
       comuna: '',
       instagram: '',
       promociones: true,
@@ -206,8 +206,11 @@ export function AuthModal() {
                   <FormField name="password" control={registerForm.control} render={({ field }) => (<FormItem><FormControl><Input type="password" placeholder="Contraseña" {...field} /></FormControl><FormMessage /></FormItem>)} />
                   <FormField control={registerForm.control} name="nombre" render={({ field }) => (<FormItem><FormControl><Input placeholder="Nombre" {...field} /></FormControl><FormMessage /></FormItem>)} />
                   <FormField control={registerForm.control} name="apellidos" render={({ field }) => (<FormItem><FormControl><Input placeholder="Apellidos" {...field} /></FormControl><FormMessage /></FormItem>)} />
-                  <FormField control={registerForm.control} name="fechaNacimiento" render={({ field }) => (<FormItem><FormControl><Input placeholder="Fecha de Nacimiento (DD-MM-YYYY)" {...field} onChange={(e) => handleDateChange(e, field.onChange)}/></FormControl><FormMessage /></FormItem>)} />
                   <FormField control={registerForm.control} name="celular" render={({ field }) => (<FormItem><FormControl><Input placeholder="+569-xxxxxxxx" {...field} onChange={(e) => handlePhoneChange(e, field.onChange)} /></FormControl><FormMessage /></FormItem>)} />
+                  
+                  <div className="text-sm font-medium text-muted-foreground pt-2">Datos Opcionales:</div>
+                  
+                  <FormField control={registerForm.control} name="fechaNacimiento" render={({ field }) => (<FormItem><FormControl><Input placeholder="Fecha de Nacimiento (DD-MM-YYYY)" {...field} onChange={(e) => handleDateChange(e, field.onChange)}/></FormControl><FormMessage /></FormItem>)} />
                   <FormField control={registerForm.control} name="comuna" render={({ field }) => (<FormItem><FormControl><Input placeholder="Comuna" {...field} /></FormControl><FormMessage /></FormItem>)} />
                   <FormField control={registerForm.control} name="instagram" render={({ field }) => (<FormItem><FormControl><Input placeholder="Instagram" {...field} /></FormControl><FormMessage /></FormItem>)} />
 

@@ -10,8 +10,8 @@ type RegisterData = {
     password: string;
     nombre: string;
     apellidos: string;
-    fechaNacimiento: string;
     celular: string;
+    fechaNacimiento?: string;
     comuna?: string;
     instagram?: string;
     promociones: boolean;
@@ -92,7 +92,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     return new Promise(resolve => {
       setTimeout(() => {
         const { password, fechaNacimiento, ...rest } = userData;
-        const formattedFechaNacimiento = fechaNacimiento.split('-').reverse().join('-');
+        const formattedFechaNacimiento = fechaNacimiento ? fechaNacimiento.split('-').reverse().join('-') : undefined;
 
         const newUser: User = { 
           id: '1', // This should be dynamic in a real app
