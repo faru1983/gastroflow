@@ -201,7 +201,7 @@ export function AuthModal() {
           <TabsContent value="registrar">
             <ScrollArea className="h-96 w-full pr-4">
               <Form {...registerForm}>
-                 <form onSubmit={registerForm.handleSubmit(onRegisterSubmit)} className="space-y-4 pt-4">
+                 <form onSubmit={registerForm.handleSubmit(onRegisterSubmit)} className="space-y-4 pt-4 pl-1">
                   <FormField name="email" control={registerForm.control} render={({ field }) => (<FormItem><FormControl><Input type="email" placeholder="E-mail" {...field} /></FormControl><FormMessage /></FormItem>)} />
                   <FormField name="password" control={registerForm.control} render={({ field }) => (<FormItem><FormControl><Input type="password" placeholder="Contraseña" {...field} /></FormControl><FormMessage /></FormItem>)} />
                   <FormField control={registerForm.control} name="nombre" render={({ field }) => (<FormItem><FormControl><Input placeholder="Nombre" {...field} /></FormControl><FormMessage /></FormItem>)} />
@@ -212,7 +212,7 @@ export function AuthModal() {
                   
                   <FormField control={registerForm.control} name="fechaNacimiento" render={({ field }) => (<FormItem><FormControl><Input placeholder="Fecha de Nacimiento (DD-MM-YYYY)" {...field} onChange={(e) => handleDateChange(e, field.onChange)}/></FormControl><FormMessage /></FormItem>)} />
                   <FormField control={registerForm.control} name="comuna" render={({ field }) => (<FormItem><FormControl><Input placeholder="Comuna" {...field} /></FormControl><FormMessage /></FormItem>)} />
-                  <FormField control={registerForm.control} name="instagram" render={({ field }) => (<FormItem><FormControl><Input placeholder="Instagram" {...field} /></FormControl><FormMessage /></FormItem>)} />
+                  <FormField control={registerForm.control} name="instagram" render={({ field }) => (<FormItem><FormControl><Input placeholder="@instagram" {...field} /></FormControl><FormMessage /></FormItem>)} />
 
                   <FormField
                     control={registerForm.control}
