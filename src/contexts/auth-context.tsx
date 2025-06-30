@@ -5,6 +5,18 @@ import React, { createContext, useState, useContext, ReactNode } from 'react';
 import type { User } from '@/lib/types';
 import { mockUser, mockAdminUser } from '@/lib/data';
 
+type RegisterData = {
+    email: string;
+    password: string;
+    nombre: string;
+    apellidos: string;
+    fechaNacimiento: string;
+    celular: string;
+    comuna?: string;
+    instagram?: string;
+    promociones: boolean;
+};
+
 interface AuthContextType {
   user: User | null;
   isAuthenticated: boolean;
@@ -13,7 +25,7 @@ interface AuthContextType {
   closeAuthModal: () => void;
   login: (email: string, pass: string) => Promise<{ success: boolean; callbackHandled: boolean }>;
   logout: () => void;
-  register: (userData: { email: string, password: string, promociones: boolean }) => Promise<{ success: boolean; callbackHandled: boolean }>;
+  register: (userData: RegisterData) => Promise<{ success: boolean; callbackHandled: boolean }>;
   updateUser: (userData: Partial<User>) => void;
 }
 
@@ -74,16 +86,22 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setUser(null);
   };
 
-  const register = async (userData: { email: string, password: string, promociones: boolean }): Promise<{ success: boolean; callbackHandled: boolean }> => {
+  const register = async (userData: RegisterData): Promise<{ success: boolean; callbackHandled: boolean }> => {
     // Mock register logic
     console.log('Registering user:', userData.email);
     return new Promise(resolve => {
       setTimeout(() => {
+        const { password, fechaNacimiento, ...rest } = userData;
+        const formattedFechaNacimiento = fechaNacimiento.split('-').reverse().join('-');
+
         const newUser: User = { 
-          id: '1', 
-          email: userData.email,
-          promociones: userData.promociones
+          id: '1', // This should be dynamic in a real app
+          ...rest,
+          fechaNacimiento: formattedFechaNacimiento,
+          comuna: userData.comuna || '',
+          instagram: userData.instagram || '',
         };
+
         setUser(newUser);
         closeAuthModal();
          if (onRegisterSuccess) {

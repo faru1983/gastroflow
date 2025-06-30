@@ -21,12 +21,11 @@ import { useEffect, useState, useCallback } from 'react';
 import { Switch } from '@/components/ui/switch';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
-import type { User } from '@/lib/types';
 
 const reservationSchema = z.object({
   date: z.date({ required_error: 'La fecha es requerida.' }),
   time: z.string().min(1, 'La hora es requerida.'),
-  people: z.coerce.number({ invalid_type_error: "Debes seleccionar la cantidad de personas." }).min(1, "Debe seleccionar al menos 1 persona.").max(8, "Máximo 8 personas."),
+  people: z.coerce.number({ errorMap: () => ({ message: "Debes seleccionar la cantidad de personas."}) }).min(1, "Debe seleccionar al menos 1 persona.").max(8, "Máximo 8 personas."),
   preference: z.string().min(1, 'La preferencia es requerida.'),
   reason: z.string().min(1, 'El motivo es requerido.'),
   comments: z.string().optional(),
@@ -82,11 +81,10 @@ export default function ReservationsPage() {
     mode: 'onChange',
   });
 
-  const prefillForm = useCallback((pendingData: any = {}) => {
+  const prefillForm = useCallback(() => {
     if (user) {
         form.reset({
             ...form.getValues(),
-            ...pendingData,
             nombre: user.nombre || '',
             apellidos: user.apellidos || '',
             email: user.email || '',
@@ -100,22 +98,10 @@ export default function ReservationsPage() {
   }, [user, form]);
 
   useEffect(() => {
-    const pendingReservationJSON = localStorage.getItem('pendingReservation');
-    if (pendingReservationJSON) {
-      if (isAuthenticated) {
-        const data = JSON.parse(pendingReservationJSON);
-        if (data.date) {
-            data.date = new Date(data.date);
-        }
-        prefillForm(data);
-        localStorage.removeItem('pendingReservation');
-        setStep(3);
-        toast({ title: '¡Bienvenido!', description: 'Continúa con tu reserva.' });
-      }
-    } else if (isAuthenticated) {
+    if (isAuthenticated) {
         prefillForm();
     }
-  }, [isAuthenticated, user, prefillForm, form, toast]);
+  }, [isAuthenticated, user, prefillForm]);
 
 
   const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>, fieldOnChange: (...event: any[]) => void) => {
@@ -159,17 +145,6 @@ export default function ReservationsPage() {
     const fields: (keyof z.infer<typeof reservationSchema>)[] = ['date', 'time', 'people', 'preference', 'reason'];
     const isValid = await form.trigger(fields);
     if (isValid) {
-      // Save reservation data to localStorage before moving to the user step
-      const reservationData = form.getValues();
-      localStorage.setItem('pendingReservation', JSON.stringify({
-        date: reservationData.date,
-        time: reservationData.time,
-        people: reservationData.people,
-        preference: reservationData.preference,
-        reason: reservationData.reason,
-        comments: reservationData.comments,
-      }));
-
       if (isAuthenticated) {
         setStep(3);
       } else {
@@ -178,12 +153,14 @@ export default function ReservationsPage() {
     }
   };
 
-  const handleLogin = () => {
-    showAuthModal({
-      onLoginSuccess: () => {
+  const handleAuth = () => {
+    const callback = () => {
         toast({ title: '¡Bienvenido!', description: 'Tus datos han sido cargados en el formulario.' });
         setStep(3);
-      },
+    };
+    showAuthModal({
+      onLoginSuccess: callback,
+      onRegisterSuccess: callback
     });
   };
 
@@ -357,7 +334,7 @@ export default function ReservationsPage() {
                         </CardDescription>
                     </CardHeader>
                     <CardContent className="grid gap-4">
-                        <Button type="button" onClick={handleLogin} className="w-full text-lg py-6">
+                        <Button type="button" onClick={handleAuth} className="w-full text-lg py-6">
                             Iniciar Sesión / Registrarse
                         </Button>
                         <Button type="button" variant="outline" onClick={() => setStep(3)} className="w-full">
