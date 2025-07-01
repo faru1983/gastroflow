@@ -366,6 +366,7 @@ export default function ReservationsPage() {
                                 </FormItem>
                             )} />
                         </div>
+                        <div className="text-sm font-medium text-muted-foreground pt-2">Datos Opcionales:</div>
                         <FormField control={form.control} name="fechaNacimiento" render={({ field }) => (
                             <FormItem>
                                 <FormControl>
@@ -375,7 +376,7 @@ export default function ReservationsPage() {
                             </FormItem>
                         )} />
                         <FormField control={form.control} name="comuna" render={({ field }) => (<FormItem><FormControl><Input placeholder="Comuna" {...field} /></FormControl><FormMessage /></FormItem>)} />
-                        <FormField control={form.control} name="instagram" render={({ field }) => (<FormItem><FormControl><Input placeholder="Instagram" {...field} /></FormControl><FormMessage /></FormItem>)} />
+                        <FormField control={form.control} name="instagram" render={({ field }) => (<FormItem><FormControl><Input placeholder="@instagram" {...field} /></FormControl><FormMessage /></FormItem>)} />
                         <FormField control={form.control} name="promociones" render={({ field }) => (
                             <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3">
                                 <div className="space-y-0.5">
