@@ -1,4 +1,3 @@
-
 "use client";
 
 import React, { useState } from 'react';
@@ -41,7 +40,7 @@ const registerSchema = z.object({
   password: z.string().min(8, 'La contraseña debe tener al menos 8 caracteres.'),
   nombre: z.string().min(1, 'Nombre es requerido.'),
   apellidos: z.string().min(1, 'Apellidos son requeridos.'),
-  celular: z.string().min(1, 'Celular es requerido.').refine(val => val.replace(/\D/g, '').length === 11, { message: 'El celular debe tener 11 dígitos en total.' }),
+  celular: z.string().min(1, 'Celular es requerido.'),
   fechaNacimiento: z.string().optional().or(z.literal("")).refine((val) => {
     if (!val) return true;
     if (!/^\d{2}-\d{2}-\d{4}$/.test(val)) return false;

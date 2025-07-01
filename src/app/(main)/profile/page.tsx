@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useEffect, useState } from 'react';
@@ -104,11 +103,6 @@ function LoggedInView() {
             }
         }
         
-        if (formData.celular && formData.celular.replace(/\D/g, '').length !== 11) {
-            toast({ variant: "destructive", title: "Error", description: "El celular debe tener 11 dígitos en total." });
-            return;
-        }
-
         if (fechaNacimiento) {
              if (!/^\d{2}-\d{2}-\d{4}$/.test(fechaNacimiento)) {
                 toast({ variant: "destructive", title: "Error", description: "Formato de fecha no válido. Usa DD-MM-YYYY." });
