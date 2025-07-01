@@ -260,7 +260,7 @@ export const usedBenefits: Benefit[] = [
     { 
     id: 'b2', 
     name: 'Postre Gratis', 
-    description: 'Beneficio de 3 visitas, utilizado el 15/06/2024.', 
+    description: 'Beneficio de cumpleaños, utilizado el 15/06/2024.', 
     qrCode: ''
   }
 ]

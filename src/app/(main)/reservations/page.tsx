@@ -70,7 +70,7 @@ const defaultValues = {
 
 export default function ReservationsPage() {
   const { toast } = useToast();
-  const { isAuthenticated, user, showAuthModal, logout } = useAuth();
+  const { isAuthenticated, user, showAuthModal, logout, addReservation } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
   const [step, setStep] = useState(1);
@@ -179,17 +179,31 @@ export default function ReservationsPage() {
     showAuthModal({
       onLoginSuccess: callback,
       onRegisterSuccess: callback,
-      fromReservation: true
     });
   };
 
   function onSubmit(data: z.infer<typeof reservationSchema>) {
     setIsLoading(true);
-    console.log(data);
+    
+    addReservation({
+      date: data.date,
+      time: data.time,
+      people: data.people,
+      preference: data.preference as any,
+      reason: data.reason as any,
+      comments: data.comments,
+      user: {
+        nombre: data.nombre,
+        apellidos: data.apellidos,
+        email: data.email,
+        celular: data.celular,
+      }
+    });
+    
     setTimeout(() => {
         toast({
-            title: '¡Reserva Confirmada!',
-            description: `Gracias ${data.nombre}, tu mesa para ${data.people} ha sido reservada para el ${format(data.date, 'PPP', { locale: es })} a las ${data.time}.`,
+            title: '¡Reserva Creada!',
+            description: `Tu mesa para ${data.people} ha sido agendada para el ${format(data.date, 'PPP', { locale: es })} a las ${data.time}. Revisa tu perfil para confirmarla.`,
         });
         
         const newDefaultValues: Partial<z.infer<typeof reservationSchema>> = {

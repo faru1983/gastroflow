@@ -11,7 +11,6 @@ import { Switch } from '@/components/ui/switch';
 import { Separator } from '@/components/ui/separator';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { mockReservations as initialReservations } from '@/lib/data';
 import { useToast } from '@/hooks/use-toast';
 import { Badge } from '@/components/ui/badge';
 import type { Reservation } from '@/lib/types';
@@ -38,16 +37,15 @@ function LoggedOutView() {
 }
 
 function LoggedInView() {
-    const { user, logout, updateUser, visits } = useAuth();
+    const { user, logout, updateUser, visits, reservations, updateReservation } = useAuth();
     const [isEditing, setIsEditing] = useState(false);
     const [deleteConfirmText, setDeleteConfirmText] = useState("");
     const { toast } = useToast();
     
-    const [reservations, setReservations] = useState<Reservation[]>(initialReservations);
     const [reservationToCancel, setReservationToCancel] = useState<Reservation | null>(null);
 
     const handleConfirmReservation = (id: string) => {
-        setReservations(prev => prev.map(res => res.id === id ? { ...res, status: 'confirmada' } : res));
+        updateReservation(id, 'confirmada');
         toast({
             title: "¡Reserva Confirmada!",
             description: "Tu reserva ha sido confirmada correctamente.",
@@ -57,7 +55,7 @@ function LoggedInView() {
 
     const handleCancelReservation = () => {
         if (reservationToCancel) {
-            setReservations(prev => prev.map(res => res.id === reservationToCancel.id ? { ...res, status: 'cancelada' } : res));
+            updateReservation(reservationToCancel.id, 'cancelada');
             toast({
                 variant: "destructive",
                 title: "Reserva Cancelada",
@@ -290,7 +288,7 @@ function LoggedInView() {
                     <Card>
                         <CardContent className="p-0">
                            <ul className="divide-y">
-                                {[...reservations].sort((a, b) => b.date.getTime() - a.date.getTime()).map(res => (
+                                {[...reservations].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()).map(res => (
                                     <li key={res.id} className="p-4 flex flex-col md:flex-row md:justify-between md:items-center gap-2">
                                         <div>
                                             <p className="font-semibold">{res.people} personas, {res.preference}</p>

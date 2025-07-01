@@ -2,8 +2,8 @@
 "use client";
 
 import React, { createContext, useState, useContext, ReactNode } from 'react';
-import type { User, Visit } from '@/lib/types';
-import { mockUser, mockAdminUser, mockVisits } from '@/lib/data';
+import type { User, Visit, Reservation } from '@/lib/types';
+import { mockUser, mockAdminUser, mockVisits, mockReservations } from '@/lib/data';
 
 type RegisterData = {
     email: string;
@@ -29,6 +29,9 @@ interface AuthContextType {
   updateUser: (userData: Partial<User>) => void;
   visits: Visit[];
   addVisit: (reason: string) => void;
+  reservations: Reservation[];
+  addReservation: (reservationData: Omit<Reservation, 'id' | 'status'>) => void;
+  updateReservation: (id: string, newStatus: 'confirmada' | 'cancelada') => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -36,6 +39,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [visits, setVisits] = useState<Visit[]>(mockVisits);
+  const [reservations, setReservations] = useState<Reservation[]>(mockReservations);
   const [isAuthModalOpen, setAuthModalOpen] = useState(false);
   const [onLoginSuccess, setOnLoginSuccess] = useState<(() => void) | null>(null);
   const [onRegisterSuccess, setOnRegisterSuccess] = useState<(() => void) | null>(null);
@@ -132,6 +136,20 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     };
     setVisits(prevVisits => [newVisit, ...prevVisits]);
   };
+  
+  const addReservation = (reservationData: Omit<Reservation, 'id' | 'status'>) => {
+    const newReservation: Reservation = {
+      ...reservationData,
+      id: `res-${Date.now()}`,
+      status: 'pendiente',
+    };
+    setReservations(prev => [newReservation, ...prev]);
+  };
+  
+  const updateReservation = (id: string, newStatus: 'confirmada' | 'cancelada') => {
+    setReservations(prev => prev.map(r => r.id === id ? { ...r, status: newStatus } : r));
+  };
+
 
   return (
     <AuthContext.Provider value={{ 
@@ -146,6 +164,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       updateUser,
       visits,
       addVisit,
+      reservations,
+      addReservation,
+      updateReservation,
     }}>
       {children}
     </AuthContext.Provider>
