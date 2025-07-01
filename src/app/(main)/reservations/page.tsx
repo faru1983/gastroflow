@@ -14,7 +14,7 @@ import { Form, FormControl, FormField, FormItem, FormMessage } from '@/component
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/auth-context';
 import { CalendarIcon, Loader2 } from 'lucide-react';
-import { cn, formatPhoneNumber, formatDateInput } from '@/lib/utils';
+import { cn, formatDateInput } from '@/lib/utils';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { useEffect, useState, useCallback } from 'react';
@@ -61,7 +61,7 @@ const defaultValues = {
   nombre: '',
   apellidos: '',
   email: '',
-  celular: '+569-',
+  celular: '',
   fechaNacimiento: '',
   comuna: '',
   instagram: '',
@@ -89,7 +89,7 @@ export default function ReservationsPage() {
             nombre: user.nombre || '',
             apellidos: user.apellidos || '',
             email: user.email || '',
-            celular: user.celular || '+569-',
+            celular: user.celular || '',
             fechaNacimiento: user.fechaNacimiento ? user.fechaNacimiento.split('-').reverse().join('-') : '',
             comuna: user.comuna || '',
             instagram: user.instagram || '',
@@ -172,7 +172,7 @@ export default function ReservationsPage() {
             (newDefaultValues as any).nombre = user.nombre || '';
             (newDefaultValues as any).apellidos = user.apellidos || '';
             (newDefaultValues as any).email = user.email || '';
-            (newDefaultValues as any).celular = user.celular || '+569-';
+            (newDefaultValues as any).celular = user.celular || '';
             (newDefaultValues as any).fechaNacimiento = user.fechaNacimiento ? user.fechaNacimiento.split('-').reverse().join('-') : '';
             (newDefaultValues as any).comuna = user.comuna || '';
             (newDefaultValues as any).instagram = user.instagram || '';
@@ -345,12 +345,26 @@ export default function ReservationsPage() {
                         </div>
                         <div className="grid md:grid-cols-2 gap-4">
                             <FormField control={form.control} name="email" render={({ field }) => (<FormItem><FormControl><Input type="email" placeholder="Email" {...field} /></FormControl><FormMessage /></FormItem>)} />
-                            <FormField control={form.control} name="celular" render={({ field }) => (
+                            <FormField
+                              control={form.control}
+                              name="celular"
+                              render={({ field }) => (
                                 <FormItem>
-                                    <FormControl><Input placeholder="+569-xxxxxxxx" {...field} onChange={(e) => field.onChange(formatPhoneNumber(e.target.value))}/></FormControl>
-                                    <FormMessage />
+                                  <FormControl>
+                                    <Input
+                                      placeholder="Celular"
+                                      {...field}
+                                      onFocus={(e) => {
+                                        if (e.target.value === '') {
+                                          field.onChange('+569-');
+                                        }
+                                      }}
+                                    />
+                                  </FormControl>
+                                  <FormMessage />
                                 </FormItem>
-                            )} />
+                              )}
+                            />
                         </div>
                         <div className="text-sm font-medium text-muted-foreground pt-2">Datos Opcionales:</div>
                         <FormField control={form.control} name="fechaNacimiento" render={({ field }) => (

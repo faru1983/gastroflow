@@ -14,7 +14,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/hooks/use-toast';
 import { Badge } from '@/components/ui/badge';
 import type { Reservation } from '@/lib/types';
-import { formatPhoneNumber, formatDateInput } from '@/lib/utils';
+import { formatDateInput } from '@/lib/utils';
 import { LoggedOutCard } from '@/components/LoggedOutCard';
 import { usePagination } from '@/hooks/use-pagination';
 import { PaginationControls } from '@/components/PaginationControls';
@@ -150,7 +150,18 @@ function LoggedInView() {
                     
                     <div className="grid md:grid-cols-2 gap-4">
                         <Input name="email" type="email" placeholder="Email" value={formData.email} onChange={handleInputChange} disabled={true} />
-                        <Input name="celular" placeholder="Celular (Ej: +569-xxxxxxxx)" value={formData.celular} onChange={(e) => setFormData({...formData, celular: formatPhoneNumber(e.target.value)})} disabled={!isEditing} />
+                        <Input
+                          name="celular"
+                          placeholder="Celular"
+                          value={formData.celular}
+                          onFocus={(e) => {
+                            if (e.target.value === '') {
+                              setFormData({ ...formData, celular: '+569-' });
+                            }
+                          }}
+                          onChange={(e) => setFormData({ ...formData, celular: e.target.value })}
+                          disabled={!isEditing}
+                        />
                     </div>
                     
                     <div className="text-sm font-medium text-muted-foreground pt-2">Datos Opcionales:</div>

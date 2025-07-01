@@ -29,7 +29,7 @@ import { useToast } from '@/hooks/use-toast';
 import { Loader2 } from 'lucide-react';
 import { Switch } from './ui/switch';
 import { ScrollArea } from './ui/scroll-area';
-import { formatDateInput, formatPhoneNumber } from '@/lib/utils';
+import { formatDateInput } from '@/lib/utils';
 
 const loginSchema = z.object({
   email: z.string().email('Email no válido.'),
@@ -74,7 +74,7 @@ export function AuthModal() {
       password: '',
       nombre: '',
       apellidos: '',
-      celular: '+569-',
+      celular: '',
       fechaNacimiento: '',
       comuna: '',
       instagram: '',
@@ -170,7 +170,26 @@ export function AuthModal() {
                   <FormField name="password" control={registerForm.control} render={({ field }) => (<FormItem><FormControl><Input type="password" placeholder="Contraseña" {...field} /></FormControl><FormMessage /></FormItem>)} />
                   <FormField control={registerForm.control} name="nombre" render={({ field }) => (<FormItem><FormControl><Input placeholder="Nombre" {...field} /></FormControl><FormMessage /></FormItem>)} />
                   <FormField control={registerForm.control} name="apellidos" render={({ field }) => (<FormItem><FormControl><Input placeholder="Apellidos" {...field} /></FormControl><FormMessage /></FormItem>)} />
-                  <FormField control={registerForm.control} name="celular" render={({ field }) => (<FormItem><FormControl><Input placeholder="+569-xxxxxxxx" {...field} onChange={(e) => field.onChange(formatPhoneNumber(e.target.value))} /></FormControl><FormMessage /></FormItem>)} />
+                  <FormField
+                    control={registerForm.control}
+                    name="celular"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormControl>
+                          <Input
+                            placeholder="Celular"
+                            {...field}
+                            onFocus={(e) => {
+                              if (e.target.value === '') {
+                                field.onChange('+569-');
+                              }
+                            }}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
                   
                   <div className="text-sm font-medium text-muted-foreground pt-2">Datos Opcionales:</div>
                   
