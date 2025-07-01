@@ -66,7 +66,7 @@ export default function MenuPage() {
             <section key={category.id}>
                  <h2 className="text-2xl font-headline mb-4">{category.name}</h2>
                  <Separator className="mb-6"/>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
                 {products.filter(p => p.categoryId === category.id).map((product) => (
                     <Card
                     key={product.id}
