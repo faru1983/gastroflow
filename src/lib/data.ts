@@ -205,7 +205,7 @@ export const mockReservations: Reservation[] = [
     people: 2,
     preference: 'Terraza',
     reason: 'Cita',
-    status: 'confirmada',
+    status: 'pendiente',
     user: { nombre: 'Ana', apellidos: 'Pérez', email: 'ana.perez@example.com', celular: '+56912345678' }
   },
   {
@@ -215,6 +215,26 @@ export const mockReservations: Reservation[] = [
     people: 4,
     preference: 'Interior',
     reason: 'Celebración',
+    status: 'cancelada',
+    user: { nombre: 'Ana', apellidos: 'Pérez', email: 'ana.perez@example.com', celular: '+56912345678' }
+  },
+  {
+    id: 'res3',
+    date: new Date(new Date().setDate(new Date().getDate() - 20)),
+    time: '19:30',
+    people: 3,
+    preference: 'Interior',
+    reason: 'General',
+    status: 'confirmada',
+    user: { nombre: 'Ana', apellidos: 'Pérez', email: 'ana.perez@example.com', celular: '+56912345678' }
+  },
+    {
+    id: 'res4',
+    date: new Date(new Date().setDate(new Date().getDate() - 30)),
+    time: '20:30',
+    people: 2,
+    preference: 'Barra',
+    reason: 'Cita',
     status: 'cancelada',
     user: { nombre: 'Ana', apellidos: 'Pérez', email: 'ana.perez@example.com', celular: '+56912345678' }
   }

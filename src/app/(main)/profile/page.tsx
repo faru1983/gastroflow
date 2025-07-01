@@ -3,17 +3,18 @@
 
 import { useEffect, useState } from 'react';
 import { useAuth } from '@/contexts/auth-context';
-import { Button } from '@/components/ui/button';
+import { Button, buttonVariants } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Separator } from '@/components/ui/separator';
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { mockReservations, mockVisits } from '@/lib/data';
+import { mockReservations as initialReservations, mockVisits } from '@/lib/data';
 import { useToast } from '@/hooks/use-toast';
 import { Badge } from '@/components/ui/badge';
+import type { Reservation } from '@/lib/types';
 
 function LoggedOutView() {
     const { showAuthModal } = useAuth();
@@ -42,6 +43,31 @@ function LoggedInView() {
     const [deleteConfirmText, setDeleteConfirmText] = useState("");
     const { toast } = useToast();
     
+    const [reservations, setReservations] = useState<Reservation[]>(initialReservations);
+    const [reservationToCancel, setReservationToCancel] = useState<Reservation | null>(null);
+
+    const handleConfirmReservation = (id: string) => {
+        setReservations(prev => prev.map(res => res.id === id ? { ...res, status: 'confirmada' } : res));
+        toast({
+            title: "¡Reserva Confirmada!",
+            description: "Tu reserva ha sido confirmada correctamente.",
+            className: 'bg-green-600 text-primary-foreground'
+        });
+    };
+
+    const handleCancelReservation = () => {
+        if (reservationToCancel) {
+            setReservations(prev => prev.map(res => res.id === reservationToCancel.id ? { ...res, status: 'cancelada' } : res));
+            toast({
+                variant: "destructive",
+                title: "Reserva Cancelada",
+                description: "Tu reserva ha sido cancelada."
+            });
+            setReservationToCancel(null);
+        }
+    };
+
+
     const [formData, setFormData] = useState({
         nombre: user?.nombre || '',
         apellidos: user?.apellidos || '',
@@ -264,15 +290,26 @@ function LoggedInView() {
                     <Card>
                         <CardContent className="p-0">
                            <ul className="divide-y">
-                                {mockReservations.map(res => (
+                                {[...reservations].sort((a, b) => b.date.getTime() - a.date.getTime()).map(res => (
                                     <li key={res.id} className="p-4 flex flex-col md:flex-row md:justify-between md:items-center gap-2">
                                         <div>
                                             <p className="font-semibold">{res.people} personas, {res.preference}</p>
                                             <p className="text-sm text-muted-foreground">{new Date(res.date).toLocaleDateString('es-CL', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })} a las {res.time}</p>
                                         </div>
                                         <div className="flex items-center gap-4">
-                                            <Badge variant={res.status === 'confirmada' ? 'default' : res.status === 'cancelada' ? 'destructive' : 'secondary'} className="capitalize">{res.status}</Badge>
-                                            {res.status === 'confirmada' && <div className="flex gap-2"><Button variant="outline" size="sm">Editar</Button><Button variant="destructive" size="sm">Cancelar</Button></div>}
+                                            {res.status === 'pendiente' && (
+                                                <div className="flex gap-2">
+                                                    <Button size="sm" onClick={() => handleConfirmReservation(res.id)} className="bg-green-600 hover:bg-green-700 text-primary-foreground">Confirmar</Button>
+                                                    <Button variant="destructive" size="sm" onClick={() => setReservationToCancel(res)}>Cancelar</Button>
+                                                </div>
+                                            )}
+                                            {res.status === 'confirmada' && (
+                                                <div className="flex items-center gap-2">
+                                                    <Badge className="border-transparent bg-green-600 text-primary-foreground hover:bg-green-600/80">Confirmada</Badge>
+                                                    {new Date(res.date) > new Date() && <Button variant="destructive" size="sm" onClick={() => setReservationToCancel(res)}>Cancelar</Button>}
+                                                </div>
+                                            )}
+                                            {res.status === 'cancelada' && <Badge variant="destructive">Cancelada</Badge>}
                                         </div>
                                     </li>
                                 ))}
@@ -295,6 +332,23 @@ function LoggedInView() {
                     </Card>
                 </TabsContent>
             </Tabs>
+
+            <AlertDialog open={!!reservationToCancel} onOpenChange={() => setReservationToCancel(null)}>
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle>¿Estás seguro de que quieres cancelar?</AlertDialogTitle>
+                        <AlertDialogDescription>
+                            Esta acción no se puede deshacer. Tu reserva será marcada como cancelada.
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel>Volver</AlertDialogCancel>
+                        <AlertDialogAction onClick={handleCancelReservation} className={buttonVariants({ variant: "destructive" })}>
+                            Confirmar Cancelación
+                        </AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
         </div>
     );
 }
