@@ -2,8 +2,8 @@
 "use client";
 
 import React, { createContext, useState, useContext, ReactNode } from 'react';
-import type { User } from '@/lib/types';
-import { mockUser, mockAdminUser } from '@/lib/data';
+import type { User, Visit } from '@/lib/types';
+import { mockUser, mockAdminUser, mockVisits } from '@/lib/data';
 
 type RegisterData = {
     email: string;
@@ -27,12 +27,15 @@ interface AuthContextType {
   logout: () => void;
   register: (userData: RegisterData) => Promise<{ success: boolean; callbackHandled: boolean }>;
   updateUser: (userData: Partial<User>) => void;
+  visits: Visit[];
+  addVisit: (reason: string) => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
+  const [visits, setVisits] = useState<Visit[]>(mockVisits);
   const [isAuthModalOpen, setAuthModalOpen] = useState(false);
   const [onLoginSuccess, setOnLoginSuccess] = useState<(() => void) | null>(null);
   const [onRegisterSuccess, setOnRegisterSuccess] = useState<(() => void) | null>(null);
@@ -121,6 +124,15 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   }
 
+  const addVisit = (reason: string) => {
+    const newVisit: Visit = {
+      id: `v${visits.length + 1}`,
+      date: new Date(),
+      reason: reason,
+    };
+    setVisits(prevVisits => [newVisit, ...prevVisits]);
+  };
+
   return (
     <AuthContext.Provider value={{ 
       user, 
@@ -131,7 +143,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       login, 
       logout,
       register,
-      updateUser
+      updateUser,
+      visits,
+      addVisit,
     }}>
       {children}
     </AuthContext.Provider>

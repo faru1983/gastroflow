@@ -11,7 +11,7 @@ import { Switch } from '@/components/ui/switch';
 import { Separator } from '@/components/ui/separator';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { mockReservations as initialReservations, mockVisits } from '@/lib/data';
+import { mockReservations as initialReservations } from '@/lib/data';
 import { useToast } from '@/hooks/use-toast';
 import { Badge } from '@/components/ui/badge';
 import type { Reservation } from '@/lib/types';
@@ -38,7 +38,7 @@ function LoggedOutView() {
 }
 
 function LoggedInView() {
-    const { user, logout, updateUser } = useAuth();
+    const { user, logout, updateUser, visits } = useAuth();
     const [isEditing, setIsEditing] = useState(false);
     const [deleteConfirmText, setDeleteConfirmText] = useState("");
     const { toast } = useToast();
@@ -321,7 +321,7 @@ function LoggedInView() {
                     <Card>
                         <CardContent className="p-0">
                              <ul className="divide-y">
-                                {mockVisits.map(visit => (
+                                {visits.map(visit => (
                                     <li key={visit.id} className="p-4">
                                         <p className="font-semibold">{visit.reason}</p>
                                         <p className="text-sm text-muted-foreground">{visit.date.toLocaleDateString('es-CL', { year: 'numeric', month: 'long', day: 'numeric' })} - {visit.date.toLocaleTimeString('es-CL', { hour: '2-digit', minute: '2-digit' })}</p>

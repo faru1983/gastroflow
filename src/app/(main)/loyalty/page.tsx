@@ -7,7 +7,7 @@ import { useAuth } from '@/contexts/auth-context';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { QrCode, Camera, X } from 'lucide-react';
-import { mockVisits, activeBenefits as initialActiveBenefits, usedBenefits as initialUsedBenefits } from '@/lib/data';
+import { activeBenefits as initialActiveBenefits, usedBenefits as initialUsedBenefits } from '@/lib/data';
 import Image from 'next/image';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -42,14 +42,13 @@ function LoggedOutView() {
 
 
 function LoggedInView() {
-    const { logout, user } = useAuth();
+    const { logout, user, visits, addVisit } = useAuth();
     const { toast } = useToast();
 
     const [isCameraActive, setIsCameraActive] = useState(false);
     const [selectedBenefit, setSelectedBenefit] = useState<Benefit | null>(null);
 
     // State for dynamic data
-    const [visits, setVisits] = useState<Visit[]>(mockVisits);
     const [activeBenefits, setActiveBenefits] = useState<Benefit[]>(initialActiveBenefits);
     const [usedBenefits, setUsedBenefits] = useState<Benefit[]>(initialUsedBenefits);
     const [newVisitReason, setNewVisitReason] = useState('');
@@ -66,21 +65,15 @@ function LoggedInView() {
             return;
         }
 
-        const newVisit: Visit = {
-            id: `v${visits.length + 1}`,
-            date: new Date(),
-            reason: newVisitReason,
-        };
-
-        const updatedVisits = [newVisit, ...visits];
-        setVisits(updatedVisits);
+        addVisit(newVisitReason);
 
         toast({
             title: "¡Visita Registrada!",
             description: "Gracias por visitarnos. Tu visita ha sido añadida a tu historial.",
         });
 
-        if (updatedVisits.length > 0 && updatedVisits.length % 5 === 0) {
+        const newTotalVisits = visits.length + 1;
+        if (newTotalVisits > 0 && newTotalVisits % 5 === 0) {
             const newBenefit: Benefit = {
                 id: `b${Date.now()}`,
                 name: '40% de Descuento',
