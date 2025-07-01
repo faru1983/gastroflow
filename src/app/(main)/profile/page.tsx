@@ -288,29 +288,36 @@ function LoggedInView() {
                     <Card>
                         <CardContent className="p-0">
                            <ul className="divide-y">
-                                {[...reservations].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()).map(res => (
-                                    <li key={res.id} className="p-4 flex flex-col md:flex-row md:justify-between md:items-center gap-2">
-                                        <div>
-                                            <p className="font-semibold">{res.people} personas, {res.preference}</p>
-                                            <p className="text-sm text-muted-foreground">{new Date(res.date).toLocaleDateString('es-CL', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })} a las {res.time}</p>
-                                        </div>
-                                        <div className="flex items-center gap-4">
-                                            {res.status === 'pendiente' && (
-                                                <div className="flex gap-2">
-                                                    <Button size="sm" onClick={() => handleConfirmReservation(res.id)} className="bg-green-600 hover:bg-green-700 text-primary-foreground">Confirmar</Button>
-                                                    <Button variant="destructive" size="sm" onClick={() => setReservationToCancel(res)}>Cancelar</Button>
-                                                </div>
-                                            )}
-                                            {res.status === 'confirmada' && (
-                                                <div className="flex items-center gap-2">
-                                                    <Badge className="border-transparent bg-green-600 text-primary-foreground hover:bg-green-600/80">Confirmada</Badge>
-                                                    {new Date(res.date) > new Date() && <Button variant="destructive" size="sm" onClick={() => setReservationToCancel(res)}>Cancelar</Button>}
-                                                </div>
-                                            )}
-                                            {res.status === 'cancelada' && <Badge variant="destructive">Cancelada</Badge>}
-                                        </div>
-                                    </li>
-                                ))}
+                                {[...reservations].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()).map(res => {
+                                    const isPast = new Date(res.date) < new Date(new Date().setHours(0, 0, 0, 0));
+                                    
+                                    return (
+                                        <li key={res.id} className="p-4 flex flex-col md:flex-row md:justify-between md:items-center gap-2">
+                                            <div>
+                                                <p className="font-semibold">{res.people} personas, {res.preference}</p>
+                                                <p className="text-sm text-muted-foreground">{new Date(res.date).toLocaleDateString('es-CL', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })} a las {res.time}</p>
+                                            </div>
+                                            <div className="flex items-center gap-4">
+                                                {res.status === 'pendiente' && !isPast && (
+                                                    <div className="flex gap-2">
+                                                        <Button size="sm" onClick={() => handleConfirmReservation(res.id)} className="bg-green-600 hover:bg-green-700 text-primary-foreground">Confirmar</Button>
+                                                        <Button variant="destructive" size="sm" onClick={() => setReservationToCancel(res)}>Cancelar</Button>
+                                                    </div>
+                                                )}
+                                                {res.status === 'confirmada' && (
+                                                    <div className="flex items-center gap-2">
+                                                        <Badge className="border-transparent bg-green-600 text-primary-foreground hover:bg-green-600/80">Confirmada</Badge>
+                                                        {!isPast && <Button variant="destructive" size="sm" onClick={() => setReservationToCancel(res)}>Cancelar</Button>}
+                                                    </div>
+                                                )}
+                                                {res.status === 'cancelada' && <Badge variant="destructive">Cancelada</Badge>}
+                                                {res.status === 'pendiente' && isPast && (
+                                                    <Badge className="border-transparent bg-yellow-400 text-yellow-950 hover:bg-yellow-400/80">Finalizada</Badge>
+                                                )}
+                                            </div>
+                                        </li>
+                                    );
+                                })}
                             </ul>
                         </CardContent>
                     </Card>

@@ -237,6 +237,16 @@ export const mockReservations: Reservation[] = [
     reason: 'Cita',
     status: 'cancelada',
     user: { nombre: 'Ana', apellidos: 'Pérez', email: 'ana.perez@example.com', celular: '+56912345678' }
+  },
+  {
+    id: 'res5',
+    date: new Date(new Date().setDate(new Date().getDate() - 5)),
+    time: '19:00',
+    people: 1,
+    preference: 'Barra',
+    reason: 'General',
+    status: 'pendiente',
+    user: { nombre: 'Ana', apellidos: 'Pérez', email: 'ana.perez@example.com', celular: '+56912345678' }
   }
 ];
 
