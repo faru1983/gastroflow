@@ -29,6 +29,7 @@ import { useToast } from '@/hooks/use-toast';
 import { Loader2 } from 'lucide-react';
 import { Switch } from './ui/switch';
 import { ScrollArea } from './ui/scroll-area';
+import { formatDateInput, formatPhoneNumber } from '@/lib/utils';
 
 const loginSchema = z.object({
   email: z.string().email('Email no válido.'),
@@ -81,43 +82,6 @@ export function AuthModal() {
     },
     mode: 'onChange',
   });
-  
-  const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>, fieldOnChange: (...event: any[]) => void) => {
-    let value = e.target.value;
-    if (!value.startsWith('+')) {
-      value = '+' + value.replace(/\D/g, '');
-    } else {
-      value = '+' + value.substring(1).replace(/\D/g, '');
-    }
-    if (value === '+') {
-      value = '+569-';
-    }
-    let numericValue = value.substring(1).replace(/\D/g, '');
-    if (numericValue.length > 11) {
-        numericValue = numericValue.substring(0, 11);
-    }
-    let formatted = '+' + numericValue;
-    if (numericValue.length > 3) {
-        formatted = `+${numericValue.substring(0, 3)}-${numericValue.substring(3)}`;
-    }
-    fieldOnChange(formatted);
-  };
-  
-  const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>, fieldOnChange: (...event: any[]) => void) => {
-    let value = e.target.value.replace(/\D/g, '');
-    if (value.length > 8) {
-        value = value.substring(0, 8);
-    }
-    let formattedValue = '';
-    if (value.length > 4) {
-        formattedValue = `${value.substring(0, 2)}-${value.substring(2, 4)}-${value.substring(4)}`;
-    } else if (value.length > 2) {
-        formattedValue = `${value.substring(0, 2)}-${value.substring(2)}`;
-    } else {
-        formattedValue = value;
-    }
-    fieldOnChange(formattedValue);
-  };
 
   const onLoginSubmit = async (values: z.infer<typeof loginSchema>) => {
     setIsLoading(true);
@@ -206,11 +170,11 @@ export function AuthModal() {
                   <FormField name="password" control={registerForm.control} render={({ field }) => (<FormItem><FormControl><Input type="password" placeholder="Contraseña" {...field} /></FormControl><FormMessage /></FormItem>)} />
                   <FormField control={registerForm.control} name="nombre" render={({ field }) => (<FormItem><FormControl><Input placeholder="Nombre" {...field} /></FormControl><FormMessage /></FormItem>)} />
                   <FormField control={registerForm.control} name="apellidos" render={({ field }) => (<FormItem><FormControl><Input placeholder="Apellidos" {...field} /></FormControl><FormMessage /></FormItem>)} />
-                  <FormField control={registerForm.control} name="celular" render={({ field }) => (<FormItem><FormControl><Input placeholder="+569-xxxxxxxx" {...field} onChange={(e) => handlePhoneChange(e, field.onChange)} /></FormControl><FormMessage /></FormItem>)} />
+                  <FormField control={registerForm.control} name="celular" render={({ field }) => (<FormItem><FormControl><Input placeholder="+569-xxxxxxxx" {...field} onChange={(e) => field.onChange(formatPhoneNumber(e.target.value))} /></FormControl><FormMessage /></FormItem>)} />
                   
                   <div className="text-sm font-medium text-muted-foreground pt-2">Datos Opcionales:</div>
                   
-                  <FormField control={registerForm.control} name="fechaNacimiento" render={({ field }) => (<FormItem><FormControl><Input placeholder="Fecha de Nacimiento (DD-MM-YYYY)" {...field} onChange={(e) => handleDateChange(e, field.onChange)}/></FormControl><FormMessage /></FormItem>)} />
+                  <FormField control={registerForm.control} name="fechaNacimiento" render={({ field }) => (<FormItem><FormControl><Input placeholder="Fecha de Nacimiento (DD-MM-YYYY)" {...field} onChange={(e) => field.onChange(formatDateInput(e.target.value))}/></FormControl><FormMessage /></FormItem>)} />
                   <div className="grid md:grid-cols-2 gap-4">
                     <FormField control={registerForm.control} name="comuna" render={({ field }) => (<FormItem><FormControl><Input placeholder="Comuna" {...field} /></FormControl><FormMessage /></FormItem>)} />
                     <FormField control={registerForm.control} name="instagram" render={({ field }) => (<FormItem><FormControl><Input placeholder="@instagram" {...field} /></FormControl><FormMessage /></FormItem>)} />

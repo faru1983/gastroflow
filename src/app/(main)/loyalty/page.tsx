@@ -6,7 +6,7 @@ import type { Visit, Benefit } from '@/lib/types';
 import { useAuth } from '@/contexts/auth-context';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { QrCode, Camera, X } from 'lucide-react';
+import { QrCode, Camera } from 'lucide-react';
 import { activeBenefits as initialActiveBenefits, usedBenefits as initialUsedBenefits } from '@/lib/data';
 import Image from 'next/image';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
@@ -14,32 +14,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
 import { Progress } from '@/components/ui/progress';
-
-function LoggedOutView() {
-    const { showAuthModal } = useAuth();
-    return (
-        <Card className="text-center">
-            <CardHeader>
-                <CardTitle className="font-headline text-2xl">Programa de Fidelización</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-                <p className="text-lg">
-                    Registra cada visita escaneando el código QR que tiene tu garzón.
-                </p>
-                <p className="text-2xl font-bold text-primary">
-                    ¡Junta 5 visitas y obtendrás un 40% de descuento!
-                </p>
-                <p className="text-muted-foreground">(Tope de descuento: $50.000)</p>
-            </CardContent>
-            <CardFooter>
-                <Button onClick={() => showAuthModal()} className="w-full">
-                    Iniciar Sesión / Registrarse
-                </Button>
-            </CardFooter>
-        </Card>
-    );
-}
-
+import { LoggedOutCard } from '@/components/LoggedOutCard';
+import { PaginationControls } from '@/components/PaginationControls';
+import { usePagination } from '@/hooks/use-pagination';
 
 function LoggedInView() {
     const { logout, user, visits, addVisit } = useAuth();
@@ -52,23 +29,12 @@ function LoggedInView() {
     const [activeBenefits, setActiveBenefits] = useState<Benefit[]>(initialActiveBenefits);
     const [usedBenefits, setUsedBenefits] = useState<Benefit[]>(initialUsedBenefits);
     const [newVisitReason, setNewVisitReason] = useState('');
-
-    // Pagination state
-    const ITEMS_PER_PAGE = 5;
-    const [activeBenefitsPage, setActiveBenefitsPage] = useState(1);
-    const [usedBenefitsPage, setUsedBenefitsPage] = useState(1);
-    const [visitsPage, setVisitsPage] = useState(1);
-
-    // Paginated data
-    const paginatedActiveBenefits = activeBenefits.slice((activeBenefitsPage - 1) * ITEMS_PER_PAGE, activeBenefitsPage * ITEMS_PER_PAGE);
-    const totalActiveBenefitsPages = Math.ceil(activeBenefits.length / ITEMS_PER_PAGE);
-
-    const paginatedUsedBenefits = usedBenefits.slice((usedBenefitsPage - 1) * ITEMS_PER_PAGE, usedBenefitsPage * ITEMS_PER_PAGE);
-    const totalUsedBenefitsPages = Math.ceil(usedBenefits.length / ITEMS_PER_PAGE);
     
-    const paginatedVisits = visits.slice((visitsPage - 1) * ITEMS_PER_PAGE, visitsPage * ITEMS_PER_PAGE);
-    const totalVisitsPages = Math.ceil(visits.length / ITEMS_PER_PAGE);
-
+    // Pagination
+    const { paginatedData: paginatedActiveBenefits, ...activeBenefitsPagination } = usePagination(activeBenefits, 5);
+    const { paginatedData: paginatedUsedBenefits, ...usedBenefitsPagination } = usePagination(usedBenefits, 5);
+    const { paginatedData: paginatedVisits, ...visitsPagination } = usePagination(visits, 5);
+    
     const visitsToNextReward = visits.length % 5;
 
     const handleRegisterVisit = () => {
@@ -213,13 +179,7 @@ function LoggedInView() {
                                         </CardFooter>
                                     </Card>
                                 ))}
-                                {activeBenefits.length > ITEMS_PER_PAGE && (
-                                    <div className="flex justify-center items-center gap-4 mt-4">
-                                        <Button onClick={() => setActiveBenefitsPage(p => p - 1)} disabled={activeBenefitsPage === 1} variant="outline">Anterior</Button>
-                                        <span className="text-sm text-muted-foreground">Página {activeBenefitsPage} de {totalActiveBenefitsPages}</span>
-                                        <Button onClick={() => setActiveBenefitsPage(p => p + 1)} disabled={activeBenefitsPage === totalActiveBenefitsPages} variant="outline">Siguiente</Button>
-                                    </div>
-                                )}
+                                <PaginationControls {...activeBenefitsPagination} />
                             </div>
                         ): (
                             <div className="text-center text-muted-foreground py-12">
@@ -240,13 +200,7 @@ function LoggedInView() {
                                         </CardHeader>
                                     </Card>
                                 ))}
-                                {usedBenefits.length > ITEMS_PER_PAGE && (
-                                    <div className="flex justify-center items-center gap-4 mt-4">
-                                        <Button onClick={() => setUsedBenefitsPage(p => p - 1)} disabled={usedBenefitsPage === 1} variant="outline">Anterior</Button>
-                                        <span className="text-sm text-muted-foreground">Página {usedBenefitsPage} de {totalUsedBenefitsPages}</span>
-                                        <Button onClick={() => setUsedBenefitsPage(p => p + 1)} disabled={usedBenefitsPage === totalUsedBenefitsPages} variant="outline">Siguiente</Button>
-                                    </div>
-                                )}
+                                <PaginationControls {...usedBenefitsPagination} />
                             </div>
                         ) : (
                             <div className="text-center text-muted-foreground py-12">
@@ -275,13 +229,9 @@ function LoggedInView() {
                                 </div>
                             )}
                         </CardContent>
-                         {visits.length > ITEMS_PER_PAGE && (
+                         {visits.length > 5 && (
                             <CardFooter className="pt-4 justify-center">
-                                <div className="flex justify-center items-center gap-4">
-                                    <Button onClick={() => setVisitsPage(p => p - 1)} disabled={visitsPage === 1} variant="outline">Anterior</Button>
-                                    <span className="text-sm text-muted-foreground">Página {visitsPage} de {totalVisitsPages}</span>
-                                    <Button onClick={() => setVisitsPage(p => p + 1)} disabled={visitsPage === totalVisitsPages} variant="outline">Siguiente</Button>
-                                </div>
+                                <PaginationControls {...visitsPagination} />
                             </CardFooter>
                         )}
                     </Card>
@@ -308,14 +258,22 @@ function LoggedInView() {
     );
 }
 
-
 export default function LoyaltyPage() {
     const { isAuthenticated } = useAuth();
     return (
         <div className="container mx-auto px-4 py-8 max-w-2xl">
-            {isAuthenticated ? <LoggedInView /> : <LoggedOutView />}
+            {isAuthenticated ? <LoggedInView /> : <LoggedOutCard 
+                title="Programa de Fidelización"
+                description="Registra cada visita escaneando el código QR que tiene tu garzón."
+                extraContent={
+                    <>
+                        <p className="text-2xl font-bold text-primary">
+                            ¡Junta 5 visitas y obtendrás un 40% de descuento!
+                        </p>
+                        <p className="text-muted-foreground">(Tope de descuento: $50.000)</p>
+                    </>
+                }
+            />}
         </div>
     );
 }
-
-    

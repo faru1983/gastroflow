@@ -14,27 +14,10 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/hooks/use-toast';
 import { Badge } from '@/components/ui/badge';
 import type { Reservation } from '@/lib/types';
-
-function LoggedOutView() {
-    const { showAuthModal } = useAuth();
-    return (
-        <Card className="text-center">
-            <CardHeader>
-                <CardTitle className="font-headline text-2xl">Mi Perfil</CardTitle>
-            </CardHeader>
-            <CardContent>
-                <p className="text-lg">
-                    Inicia sesión o crea una cuenta para gestionar tus reservas, ver tu historial de visitas y acceder a beneficios exclusivos.
-                </p>
-            </CardContent>
-            <CardFooter>
-                <Button onClick={() => showAuthModal()} className="w-full">
-                    Iniciar Sesión / Registrarse
-                </Button>
-            </CardFooter>
-        </Card>
-    );
-}
+import { formatPhoneNumber, formatDateInput } from '@/lib/utils';
+import { LoggedOutCard } from '@/components/LoggedOutCard';
+import { usePagination } from '@/hooks/use-pagination';
+import { PaginationControls } from '@/components/PaginationControls';
 
 function LoggedInView() {
     const { user, logout, updateUser, visits, reservations, updateReservation } = useAuth();
@@ -44,18 +27,11 @@ function LoggedInView() {
     
     const [reservationToCancel, setReservationToCancel] = useState<Reservation | null>(null);
 
-    // Pagination state
-    const ITEMS_PER_PAGE = 5;
-    const [reservationsPage, setReservationsPage] = useState(1);
-    const [visitsPage, setVisitsPage] = useState(1);
-    
-    // Paginated data
+    // Pagination
     const sortedReservations = [...reservations].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
-    const paginatedReservations = sortedReservations.slice((reservationsPage - 1) * ITEMS_PER_PAGE, reservationsPage * ITEMS_PER_PAGE);
-    const totalReservationsPages = Math.ceil(sortedReservations.length / ITEMS_PER_PAGE);
-
-    const paginatedVisits = visits.slice((visitsPage - 1) * ITEMS_PER_PAGE, visitsPage * ITEMS_PER_PAGE);
-    const totalVisitsPages = Math.ceil(visits.length / ITEMS_PER_PAGE);
+    const { paginatedData: paginatedReservations, ...reservationsPagination } = usePagination(sortedReservations, 5);
+    const { paginatedData: paginatedVisits, ...visitsPagination } = usePagination(visits, 5);
+    
 
     const handleConfirmReservation = (id: string) => {
         updateReservation(id, 'confirmada');
@@ -78,15 +54,14 @@ function LoggedInView() {
         }
     };
 
-
     const [formData, setFormData] = useState({
         nombre: user?.nombre || '',
         apellidos: user?.apellidos || '',
+        email: user?.email || '',
+        celular: user?.celular || '',
         fechaNacimiento: user?.fechaNacimiento ? user.fechaNacimiento.split('-').reverse().join('-') : '',
         comuna: user?.comuna || '',
         instagram: user?.instagram || '',
-        email: user?.email || '',
-        celular: user?.celular || '+569-',
         promociones: user?.promociones ?? true,
         currentPassword: '',
         newPassword: '',
@@ -98,11 +73,11 @@ function LoggedInView() {
             setFormData({
                 nombre: user.nombre || '',
                 apellidos: user.apellidos || '',
+                email: user.email || '',
+                celular: user.celular || '',
                 fechaNacimiento: user.fechaNacimiento ? user.fechaNacimiento.split('-').reverse().join('-') : '',
                 comuna: user.comuna || '',
                 instagram: user.instagram || '',
-                email: user.email || '',
-                celular: user.celular || '+569-',
                 promociones: user.promociones,
                 currentPassword: '',
                 newPassword: '',
@@ -113,50 +88,6 @@ function LoggedInView() {
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
-    };
-    
-    const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        let value = e.target.value;
-
-        if (!value.startsWith('+')) {
-            value = '+' + value.replace(/\D/g, '');
-        } else {
-            value = '+' + value.substring(1).replace(/\D/g, '');
-        }
-        
-        if (value === '+') {
-            value = '+569-';
-        }
-
-        let numericValue = value.substring(1).replace(/\D/g, '');
-        
-        if (numericValue.length > 11) {
-            numericValue = numericValue.substring(0, 11);
-        }
-        
-        let formatted = '+' + numericValue;
-
-        if (numericValue.length > 3) {
-            formatted = `+${numericValue.substring(0, 3)}-${numericValue.substring(3)}`;
-        }
-        
-        setFormData({ ...formData, celular: formatted });
-    };
-
-    const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        let value = e.target.value.replace(/\D/g, '');
-        if (value.length > 8) {
-            value = value.substring(0, 8);
-        }
-        let formattedValue = '';
-        if (value.length > 4) {
-            formattedValue = `${value.substring(0, 2)}-${value.substring(2, 4)}-${value.substring(4)}`;
-        } else if (value.length > 2) {
-            formattedValue = `${value.substring(0, 2)}-${value.substring(2)}`;
-        } else {
-            formattedValue = value;
-        }
-        setFormData({ ...formData, fechaNacimiento: formattedValue });
     };
 
     const handleUpdate = () => {
@@ -219,12 +150,12 @@ function LoggedInView() {
                     
                     <div className="grid md:grid-cols-2 gap-4">
                         <Input name="email" type="email" placeholder="Email" value={formData.email} onChange={handleInputChange} disabled={true} />
-                        <Input name="celular" placeholder="Celular (Ej: +569-xxxxxxxx)" value={formData.celular} onChange={handlePhoneChange} disabled={!isEditing} />
+                        <Input name="celular" placeholder="Celular (Ej: +569-xxxxxxxx)" value={formData.celular} onChange={(e) => setFormData({...formData, celular: formatPhoneNumber(e.target.value)})} disabled={!isEditing} />
                     </div>
                     
                     <div className="text-sm font-medium text-muted-foreground pt-2">Datos Opcionales:</div>
 
-                    <Input name="fechaNacimiento" placeholder="Fecha de Nacimiento (DD-MM-YYYY)" value={formData.fechaNacimiento} onChange={handleDateChange} disabled={!isEditing} />
+                    <Input name="fechaNacimiento" placeholder="Fecha de Nacimiento (DD-MM-YYYY)" value={formData.fechaNacimiento} onChange={(e) => setFormData({...formData, fechaNacimiento: formatDateInput(e.target.value)})} disabled={!isEditing} />
                     
                     <div className="grid md:grid-cols-2 gap-4">
                         <Input name="comuna" placeholder="Comuna" value={formData.comuna} onChange={handleInputChange} disabled={!isEditing} />
@@ -333,13 +264,9 @@ function LoggedInView() {
                                 })}
                             </ul>
                         </CardContent>
-                        {reservations.length > ITEMS_PER_PAGE && (
+                        {reservations.length > 5 && (
                             <CardFooter className="pt-4 justify-center">
-                                <div className="flex justify-center items-center gap-4">
-                                    <Button onClick={() => setReservationsPage(p => p - 1)} disabled={reservationsPage === 1} variant="outline">Anterior</Button>
-                                    <span className="text-sm text-muted-foreground">Página {reservationsPage} de {totalReservationsPages}</span>
-                                    <Button onClick={() => setReservationsPage(p => p + 1)} disabled={reservationsPage === totalReservationsPages} variant="outline">Siguiente</Button>
-                                </div>
+                                <PaginationControls {...reservationsPagination} />
                             </CardFooter>
                         )}
                     </Card>
@@ -356,13 +283,9 @@ function LoggedInView() {
                                 ))}
                             </ul>
                         </CardContent>
-                         {visits.length > ITEMS_PER_PAGE && (
+                         {visits.length > 5 && (
                             <CardFooter className="pt-4 justify-center">
-                                <div className="flex justify-center items-center gap-4">
-                                    <Button onClick={() => setVisitsPage(p => p - 1)} disabled={visitsPage === 1} variant="outline">Anterior</Button>
-                                    <span className="text-sm text-muted-foreground">Página {visitsPage} de {totalVisitsPages}</span>
-                                    <Button onClick={() => setVisitsPage(p => p + 1)} disabled={visitsPage === totalVisitsPages} variant="outline">Siguiente</Button>
-                                </div>
+                                <PaginationControls {...visitsPagination} />
                             </CardFooter>
                         )}
                     </Card>
@@ -393,7 +316,10 @@ export default function ProfilePage() {
     const { isAuthenticated } = useAuth();
     return (
         <div className="container mx-auto px-4 py-8 max-w-4xl">
-            {isAuthenticated ? <LoggedInView /> : <LoggedOutView />}
+            {isAuthenticated ? <LoggedInView /> : <LoggedOutCard 
+                title="Mi Perfil"
+                description="Inicia sesión o crea una cuenta para gestionar tus reservas, ver tu historial de visitas y acceder a beneficios exclusivos."
+            />}
         </div>
     );
 }

@@ -1,7 +1,7 @@
 
 "use client";
 
-import React, { createContext, useState, useContext, ReactNode } from 'react';
+import React, { createContext, useState, useContext, ReactNode, useEffect } from 'react';
 import type { User, Visit, Reservation } from '@/lib/types';
 import { mockUser, mockAdminUser, mockVisits, mockReservations } from '@/lib/data';
 
@@ -27,6 +27,7 @@ interface AuthContextType {
   logout: () => void;
   register: (userData: RegisterData) => Promise<{ success: boolean; callbackHandled: boolean }>;
   updateUser: (userData: Partial<User>) => void;
+  // Data managed by pages now, but exposed via context for simplicity for now
   visits: Visit[];
   addVisit: (reason: string) => void;
   reservations: Reservation[];
@@ -38,11 +39,25 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
-  const [visits, setVisits] = useState<Visit[]>(mockVisits);
-  const [reservations, setReservations] = useState<Reservation[]>(mockReservations);
   const [isAuthModalOpen, setAuthModalOpen] = useState(false);
   const [onLoginSuccess, setOnLoginSuccess] = useState<(() => void) | null>(null);
   const [onRegisterSuccess, setOnRegisterSuccess] = useState<(() => void) | null>(null);
+
+  // These should be fetched by pages, but we keep them in context for mock data simplicity
+  const [visits, setVisits] = useState<Visit[]>([]);
+  const [reservations, setReservations] = useState<Reservation[]>([]);
+
+  useEffect(() => {
+    // Simulate fetching data when user logs in
+    if (user) {
+      setVisits(mockVisits);
+      setReservations(mockReservations);
+    } else {
+      setVisits([]);
+      setReservations([]);
+    }
+  }, [user]);
+
 
   const showAuthModal = (options?: { onLoginSuccess?: () => void; onRegisterSuccess?: () => void }) => {
     if (options?.onLoginSuccess) {
@@ -62,13 +77,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const login = async (email: string, pass: string): Promise<{ success: boolean; callbackHandled: boolean }> => {
     // Mock login logic
-    console.log(`Attempting login with ${email}`);
     return new Promise(resolve => {
       setTimeout(() => {
         let loggedInUser: User | null = null;
-        if (email === 'ana.perez@example.com' && pass === 'password') {
+        if (email.toLowerCase() === 'ana.perez@example.com' && pass === 'password') {
           loggedInUser = mockUser;
-        } else if (email === 'admin@admin.com' && pass === 'admin') {
+        } else if (email.toLowerCase() === 'admin@admin.com' && pass === 'admin') {
           loggedInUser = mockAdminUser;
         }
 
@@ -95,14 +109,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const register = async (userData: RegisterData): Promise<{ success: boolean; callbackHandled: boolean }> => {
     // Mock register logic
-    console.log('Registering user:', userData.email);
     return new Promise(resolve => {
       setTimeout(() => {
         const { password, fechaNacimiento, ...rest } = userData;
         const formattedFechaNacimiento = fechaNacimiento ? fechaNacimiento.split('-').reverse().join('-') : undefined;
 
         const newUser: User = { 
-          id: '1', // This should be dynamic in a real app
+          id: `u${Date.now()}`,
           ...rest,
           fechaNacimiento: formattedFechaNacimiento,
           comuna: userData.comuna || '',

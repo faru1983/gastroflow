@@ -14,7 +14,7 @@ import { Form, FormControl, FormField, FormItem, FormMessage } from '@/component
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/auth-context';
 import { CalendarIcon, Loader2 } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { cn, formatPhoneNumber, formatDateInput } from '@/lib/utils';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { useEffect, useState, useCallback } from 'react';
@@ -107,55 +107,16 @@ export default function ReservationsPage() {
     const storedReservation = sessionStorage.getItem('pendingReservation');
     if (storedReservation) {
       const reservationData = JSON.parse(storedReservation);
-      // Convert date string back to Date object
       if (reservationData.date) {
         reservationData.date = new Date(reservationData.date);
       }
       prefillForm(reservationData);
-      setStep(3); // Go to contact step
+      setStep(3);
       sessionStorage.removeItem('pendingReservation');
     } else if (isAuthenticated) {
         prefillForm();
     }
   }, [isAuthenticated, user, prefillForm]);
-
-
-  const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>, fieldOnChange: (...event: any[]) => void) => {
-    let value = e.target.value;
-    if (!value.startsWith('+')) {
-      value = '+' + value.replace(/\D/g, '');
-    } else {
-      value = '+' + value.substring(1).replace(/\D/g, '');
-    }
-    if (value === '+') {
-      value = '+569-';
-    }
-    let numericValue = value.substring(1).replace(/\D/g, '');
-    if (numericValue.length > 11) {
-        numericValue = numericValue.substring(0, 11);
-    }
-    let formatted = '+' + numericValue;
-    if (numericValue.length > 3) {
-        formatted = `+${numericValue.substring(0, 3)}-${numericValue.substring(3)}`;
-    }
-    fieldOnChange(formatted);
-  };
-  
-  const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>, fieldOnChange: (...event: any[]) => void) => {
-    let value = e.target.value.replace(/\D/g, '');
-    if (value.length > 8) {
-        value = value.substring(0, 8);
-    }
-    let formattedValue = '';
-    if (value.length > 4) {
-        formattedValue = `${value.substring(0, 2)}-${value.substring(2, 4)}-${value.substring(4)}`;
-    } else if (value.length > 2) {
-        formattedValue = `${value.substring(0, 2)}-${value.substring(2)}`;
-    } else {
-        formattedValue = value;
-    }
-    fieldOnChange(formattedValue);
-  };
 
   const handleNext = async () => {
     const fields: (keyof z.infer<typeof reservationSchema>)[] = ['date', 'time', 'people', 'preference', 'reason', 'comments'];
@@ -172,10 +133,7 @@ export default function ReservationsPage() {
   };
 
   const handleAuth = () => {
-    const callback = () => {
-        // Callback no longer needs to do anything complex,
-        // the useEffect will handle pre-filling the form.
-    };
+    const callback = () => {};
     showAuthModal({
       onLoginSuccess: callback,
       onRegisterSuccess: callback,
@@ -389,7 +347,7 @@ export default function ReservationsPage() {
                             <FormField control={form.control} name="email" render={({ field }) => (<FormItem><FormControl><Input type="email" placeholder="Email" {...field} /></FormControl><FormMessage /></FormItem>)} />
                             <FormField control={form.control} name="celular" render={({ field }) => (
                                 <FormItem>
-                                    <FormControl><Input placeholder="+569-xxxxxxxx" {...field} onChange={(e) => handlePhoneChange(e, field.onChange)}/></FormControl>
+                                    <FormControl><Input placeholder="+569-xxxxxxxx" {...field} onChange={(e) => field.onChange(formatPhoneNumber(e.target.value))}/></FormControl>
                                     <FormMessage />
                                 </FormItem>
                             )} />
@@ -398,7 +356,7 @@ export default function ReservationsPage() {
                         <FormField control={form.control} name="fechaNacimiento" render={({ field }) => (
                             <FormItem>
                                 <FormControl>
-                                    <Input placeholder="Fecha nacimiento (DD-MM-YYYY)" {...field} onChange={(e) => handleDateChange(e, field.onChange)} />
+                                    <Input placeholder="Fecha nacimiento (DD-MM-YYYY)" {...field} onChange={(e) => field.onChange(formatDateInput(e.target.value))} />
                                 </FormControl>
                                 <FormMessage />
                             </FormItem>
