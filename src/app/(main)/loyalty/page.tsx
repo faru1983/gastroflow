@@ -53,6 +53,22 @@ function LoggedInView() {
     const [usedBenefits, setUsedBenefits] = useState<Benefit[]>(initialUsedBenefits);
     const [newVisitReason, setNewVisitReason] = useState('');
 
+    // Pagination state
+    const ITEMS_PER_PAGE = 5;
+    const [activeBenefitsPage, setActiveBenefitsPage] = useState(1);
+    const [usedBenefitsPage, setUsedBenefitsPage] = useState(1);
+    const [visitsPage, setVisitsPage] = useState(1);
+
+    // Paginated data
+    const paginatedActiveBenefits = activeBenefits.slice((activeBenefitsPage - 1) * ITEMS_PER_PAGE, activeBenefitsPage * ITEMS_PER_PAGE);
+    const totalActiveBenefitsPages = Math.ceil(activeBenefits.length / ITEMS_PER_PAGE);
+
+    const paginatedUsedBenefits = usedBenefits.slice((usedBenefitsPage - 1) * ITEMS_PER_PAGE, usedBenefitsPage * ITEMS_PER_PAGE);
+    const totalUsedBenefitsPages = Math.ceil(usedBenefits.length / ITEMS_PER_PAGE);
+    
+    const paginatedVisits = visits.slice((visitsPage - 1) * ITEMS_PER_PAGE, visitsPage * ITEMS_PER_PAGE);
+    const totalVisitsPages = Math.ceil(visits.length / ITEMS_PER_PAGE);
+
     const visitsToNextReward = visits.length % 5;
 
     const handleRegisterVisit = () => {
@@ -184,9 +200,9 @@ function LoggedInView() {
                 </TabsList>
                 <TabsContent value="disponibles">
                     <div className="mt-4">
-                        {activeBenefits.length > 0 ? (
+                        {paginatedActiveBenefits.length > 0 ? (
                             <div className="space-y-4">
-                                {activeBenefits.map(benefit => (
+                                {paginatedActiveBenefits.map(benefit => (
                                     <Card key={benefit.id} className="bg-secondary">
                                         <CardHeader>
                                             <CardTitle>{benefit.name}</CardTitle>
@@ -197,6 +213,13 @@ function LoggedInView() {
                                         </CardFooter>
                                     </Card>
                                 ))}
+                                {activeBenefits.length > ITEMS_PER_PAGE && (
+                                    <div className="flex justify-center items-center gap-4 mt-4">
+                                        <Button onClick={() => setActiveBenefitsPage(p => p - 1)} disabled={activeBenefitsPage === 1} variant="outline">Anterior</Button>
+                                        <span className="text-sm text-muted-foreground">Página {activeBenefitsPage} de {totalActiveBenefitsPages}</span>
+                                        <Button onClick={() => setActiveBenefitsPage(p => p + 1)} disabled={activeBenefitsPage === totalActiveBenefitsPages} variant="outline">Siguiente</Button>
+                                    </div>
+                                )}
                             </div>
                         ): (
                             <div className="text-center text-muted-foreground py-12">
@@ -207,9 +230,9 @@ function LoggedInView() {
                 </TabsContent>
                 <TabsContent value="usados">
                     <div className="mt-4">
-                        {usedBenefits.length > 0 ? (
-                            <div className="space-y-4">
-                                {usedBenefits.map(benefit => (
+                        {paginatedUsedBenefits.length > 0 ? (
+                             <div className="space-y-4">
+                                {paginatedUsedBenefits.map(benefit => (
                                 <Card key={benefit.id} className="opacity-60">
                                         <CardHeader>
                                             <CardTitle>{benefit.name}</CardTitle>
@@ -217,6 +240,13 @@ function LoggedInView() {
                                         </CardHeader>
                                     </Card>
                                 ))}
+                                {usedBenefits.length > ITEMS_PER_PAGE && (
+                                    <div className="flex justify-center items-center gap-4 mt-4">
+                                        <Button onClick={() => setUsedBenefitsPage(p => p - 1)} disabled={usedBenefitsPage === 1} variant="outline">Anterior</Button>
+                                        <span className="text-sm text-muted-foreground">Página {usedBenefitsPage} de {totalUsedBenefitsPages}</span>
+                                        <Button onClick={() => setUsedBenefitsPage(p => p + 1)} disabled={usedBenefitsPage === totalUsedBenefitsPages} variant="outline">Siguiente</Button>
+                                    </div>
+                                )}
                             </div>
                         ) : (
                             <div className="text-center text-muted-foreground py-12">
@@ -230,7 +260,7 @@ function LoggedInView() {
                         <CardContent className="p-0">
                             {visits.length > 0 ? (
                                 <ul className="divide-y">
-                                    {visits.map(visit => (
+                                    {paginatedVisits.map(visit => (
                                         <li key={visit.id} className="p-4 flex justify-between items-center">
                                             <div>
                                                 <p className="font-semibold">{visit.reason}</p>
@@ -240,11 +270,20 @@ function LoggedInView() {
                                     ))}
                                 </ul>
                             ) : (
-                                <div className="text-center text-muted-foreground py-12">
+                                <div className="text-center text-muted-foreground p-12">
                                     <p>No has registrado ninguna visita todavía.</p>
                                 </div>
                             )}
                         </CardContent>
+                         {visits.length > ITEMS_PER_PAGE && (
+                            <CardFooter className="pt-4 justify-center">
+                                <div className="flex justify-center items-center gap-4">
+                                    <Button onClick={() => setVisitsPage(p => p - 1)} disabled={visitsPage === 1} variant="outline">Anterior</Button>
+                                    <span className="text-sm text-muted-foreground">Página {visitsPage} de {totalVisitsPages}</span>
+                                    <Button onClick={() => setVisitsPage(p => p + 1)} disabled={visitsPage === totalVisitsPages} variant="outline">Siguiente</Button>
+                                </div>
+                            </CardFooter>
+                        )}
                     </Card>
                 </TabsContent>
             </Tabs>

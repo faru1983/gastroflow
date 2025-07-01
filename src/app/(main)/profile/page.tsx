@@ -44,6 +44,19 @@ function LoggedInView() {
     
     const [reservationToCancel, setReservationToCancel] = useState<Reservation | null>(null);
 
+    // Pagination state
+    const ITEMS_PER_PAGE = 5;
+    const [reservationsPage, setReservationsPage] = useState(1);
+    const [visitsPage, setVisitsPage] = useState(1);
+    
+    // Paginated data
+    const sortedReservations = [...reservations].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+    const paginatedReservations = sortedReservations.slice((reservationsPage - 1) * ITEMS_PER_PAGE, reservationsPage * ITEMS_PER_PAGE);
+    const totalReservationsPages = Math.ceil(sortedReservations.length / ITEMS_PER_PAGE);
+
+    const paginatedVisits = visits.slice((visitsPage - 1) * ITEMS_PER_PAGE, visitsPage * ITEMS_PER_PAGE);
+    const totalVisitsPages = Math.ceil(visits.length / ITEMS_PER_PAGE);
+
     const handleConfirmReservation = (id: string) => {
         updateReservation(id, 'confirmada');
         toast({
@@ -288,7 +301,7 @@ function LoggedInView() {
                     <Card>
                         <CardContent className="p-0">
                            <ul className="divide-y">
-                                {[...reservations].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()).map(res => {
+                                {paginatedReservations.map(res => {
                                     const isPast = new Date(res.date) < new Date(new Date().setHours(0, 0, 0, 0));
                                     
                                     return (
@@ -320,13 +333,22 @@ function LoggedInView() {
                                 })}
                             </ul>
                         </CardContent>
+                        {reservations.length > ITEMS_PER_PAGE && (
+                            <CardFooter className="pt-4 justify-center">
+                                <div className="flex justify-center items-center gap-4">
+                                    <Button onClick={() => setReservationsPage(p => p - 1)} disabled={reservationsPage === 1} variant="outline">Anterior</Button>
+                                    <span className="text-sm text-muted-foreground">Página {reservationsPage} de {totalReservationsPages}</span>
+                                    <Button onClick={() => setReservationsPage(p => p + 1)} disabled={reservationsPage === totalReservationsPages} variant="outline">Siguiente</Button>
+                                </div>
+                            </CardFooter>
+                        )}
                     </Card>
                 </TabsContent>
                 <TabsContent value="visits">
                     <Card>
                         <CardContent className="p-0">
                              <ul className="divide-y">
-                                {visits.map(visit => (
+                                {paginatedVisits.map(visit => (
                                     <li key={visit.id} className="p-4">
                                         <p className="font-semibold">{visit.reason}</p>
                                         <p className="text-sm text-muted-foreground">{visit.date.toLocaleDateString('es-CL', { year: 'numeric', month: 'long', day: 'numeric' })} - {visit.date.toLocaleTimeString('es-CL', { hour: '2-digit', minute: '2-digit' })}</p>
@@ -334,6 +356,15 @@ function LoggedInView() {
                                 ))}
                             </ul>
                         </CardContent>
+                         {visits.length > ITEMS_PER_PAGE && (
+                            <CardFooter className="pt-4 justify-center">
+                                <div className="flex justify-center items-center gap-4">
+                                    <Button onClick={() => setVisitsPage(p => p - 1)} disabled={visitsPage === 1} variant="outline">Anterior</Button>
+                                    <span className="text-sm text-muted-foreground">Página {visitsPage} de {totalVisitsPages}</span>
+                                    <Button onClick={() => setVisitsPage(p => p + 1)} disabled={visitsPage === totalVisitsPages} variant="outline">Siguiente</Button>
+                                </div>
+                            </CardFooter>
+                        )}
                     </Card>
                 </TabsContent>
             </Tabs>
