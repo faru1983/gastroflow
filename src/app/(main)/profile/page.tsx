@@ -180,16 +180,18 @@ function LoggedInView() {
                         <Input name="apellidos" placeholder="Apellidos" value={formData.apellidos} onChange={handleInputChange} disabled={!isEditing} />
                     </div>
                     
+                    <div className="grid md:grid-cols-2 gap-4">
+                        <Input name="email" type="email" placeholder="Email" value={formData.email} onChange={handleInputChange} disabled={true} />
+                        <Input name="celular" placeholder="Celular (Ej: +569-xxxxxxxx)" value={formData.celular} onChange={handlePhoneChange} disabled={!isEditing} />
+                    </div>
+                    
+                    <div className="text-sm font-medium text-muted-foreground pt-2">Datos Opcionales:</div>
+
                     <Input name="fechaNacimiento" placeholder="Fecha de Nacimiento (DD-MM-YYYY)" value={formData.fechaNacimiento} onChange={handleDateChange} disabled={!isEditing} />
                     
                     <Input name="comuna" placeholder="Comuna" value={formData.comuna} onChange={handleInputChange} disabled={!isEditing} />
                     
-                    <div className="grid md:grid-cols-2 gap-4">
-                        <Input name="celular" placeholder="Celular (Ej: +569-xxxxxxxx)" value={formData.celular} onChange={handlePhoneChange} disabled={!isEditing} />
-                        <Input name="instagram" placeholder="Instagram" value={formData.instagram} onChange={handleInputChange} disabled={!isEditing} />
-                    </div>
-                    
-                    <Input name="email" type="email" placeholder="Email" value={formData.email} onChange={handleInputChange} disabled={true} />
+                    <Input name="instagram" placeholder="@instagram" value={formData.instagram} onChange={handleInputChange} disabled={!isEditing} />
 
                     {isEditing && (
                         <>
