@@ -4,7 +4,6 @@ import { summarizeReviews } from '@/ai/flows/summarize-reviews';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
-import { Footer } from '@/components/Footer';
 import { Phone, MapPin, BookOpenText, CalendarClock, Heart } from 'lucide-react';
 import { TiktokIcon } from '@/components/icons/TiktokIcon';
 import { WhatsappIcon } from '@/components/icons/WhatsappIcon';
@@ -132,7 +131,6 @@ export default async function HomePage() {
             </div>
         </section>
       </div>
-      <Footer />
     </div>
   );
 }
