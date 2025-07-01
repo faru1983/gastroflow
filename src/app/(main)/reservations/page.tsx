@@ -81,10 +81,11 @@ export default function ReservationsPage() {
     mode: 'onChange',
   });
 
-  const prefillForm = useCallback(() => {
+  const prefillForm = useCallback((reservationData?: Partial<z.infer<typeof reservationSchema>>) => {
     if (user) {
         form.reset({
-            ...form.getValues(),
+            ...defaultValues,
+            ...reservationData,
             nombre: user.nombre || '',
             apellidos: user.apellidos || '',
             email: user.email || '',
@@ -94,11 +95,26 @@ export default function ReservationsPage() {
             instagram: user.instagram || '',
             promociones: user.promociones ?? true,
         });
+    } else if (reservationData) {
+        form.reset({
+            ...defaultValues,
+            ...reservationData
+        });
     }
   }, [user, form]);
 
   useEffect(() => {
-    if (isAuthenticated) {
+    const storedReservation = sessionStorage.getItem('pendingReservation');
+    if (storedReservation) {
+      const reservationData = JSON.parse(storedReservation);
+      // Convert date string back to Date object
+      if (reservationData.date) {
+        reservationData.date = new Date(reservationData.date);
+      }
+      prefillForm(reservationData);
+      setStep(3); // Go to contact step
+      sessionStorage.removeItem('pendingReservation');
+    } else if (isAuthenticated) {
         prefillForm();
     }
   }, [isAuthenticated, user, prefillForm]);
@@ -142,9 +158,11 @@ export default function ReservationsPage() {
   };
 
   const handleNext = async () => {
-    const fields: (keyof z.infer<typeof reservationSchema>)[] = ['date', 'time', 'people', 'preference', 'reason'];
+    const fields: (keyof z.infer<typeof reservationSchema>)[] = ['date', 'time', 'people', 'preference', 'reason', 'comments'];
     const isValid = await form.trigger(fields);
     if (isValid) {
+      const reservationData = form.getValues();
+      sessionStorage.setItem('pendingReservation', JSON.stringify(reservationData));
       if (isAuthenticated) {
         setStep(3);
       } else {
@@ -155,12 +173,13 @@ export default function ReservationsPage() {
 
   const handleAuth = () => {
     const callback = () => {
-        toast({ title: '¡Bienvenido!', description: 'Tus datos han sido cargados en el formulario.' });
-        setStep(3);
+        // Callback no longer needs to do anything complex,
+        // the useEffect will handle pre-filling the form.
     };
     showAuthModal({
       onLoginSuccess: callback,
-      onRegisterSuccess: callback
+      onRegisterSuccess: callback,
+      fromReservation: true
     });
   };
 
@@ -175,11 +194,6 @@ export default function ReservationsPage() {
         
         const newDefaultValues: Partial<z.infer<typeof reservationSchema>> = {
             ...defaultValues,
-            time: '',
-            preference: '',
-            reason: '',
-            people: undefined,
-            date: undefined,
         };
 
         if (isAuthenticated && user) {
@@ -375,8 +389,10 @@ export default function ReservationsPage() {
                                 <FormMessage />
                             </FormItem>
                         )} />
-                        <FormField control={form.control} name="comuna" render={({ field }) => (<FormItem><FormControl><Input placeholder="Comuna" {...field} /></FormControl><FormMessage /></FormItem>)} />
-                        <FormField control={form.control} name="instagram" render={({ field }) => (<FormItem><FormControl><Input placeholder="@instagram" {...field} /></FormControl><FormMessage /></FormItem>)} />
+                        <div className="grid md:grid-cols-2 gap-4">
+                            <FormField control={form.control} name="comuna" render={({ field }) => (<FormItem><FormControl><Input placeholder="Comuna" {...field} /></FormControl><FormMessage /></FormItem>)} />
+                            <FormField control={form.control} name="instagram" render={({ field }) => (<FormItem><FormControl><Input placeholder="@instagram" {...field} /></FormControl><FormMessage /></FormItem>)} />
+                        </div>
                         <FormField control={form.control} name="promociones" render={({ field }) => (
                             <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3">
                                 <div className="space-y-0.5">

@@ -189,9 +189,10 @@ function LoggedInView() {
 
                     <Input name="fechaNacimiento" placeholder="Fecha de Nacimiento (DD-MM-YYYY)" value={formData.fechaNacimiento} onChange={handleDateChange} disabled={!isEditing} />
                     
-                    <Input name="comuna" placeholder="Comuna" value={formData.comuna} onChange={handleInputChange} disabled={!isEditing} />
-                    
-                    <Input name="instagram" placeholder="@instagram" value={formData.instagram} onChange={handleInputChange} disabled={!isEditing} />
+                    <div className="grid md:grid-cols-2 gap-4">
+                        <Input name="comuna" placeholder="Comuna" value={formData.comuna} onChange={handleInputChange} disabled={!isEditing} />
+                        <Input name="instagram" placeholder="@instagram" value={formData.instagram} onChange={handleInputChange} disabled={!isEditing} />
+                    </div>
 
                     {isEditing && (
                         <>

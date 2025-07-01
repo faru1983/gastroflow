@@ -211,8 +211,10 @@ export function AuthModal() {
                   <div className="text-sm font-medium text-muted-foreground pt-2">Datos Opcionales:</div>
                   
                   <FormField control={registerForm.control} name="fechaNacimiento" render={({ field }) => (<FormItem><FormControl><Input placeholder="Fecha de Nacimiento (DD-MM-YYYY)" {...field} onChange={(e) => handleDateChange(e, field.onChange)}/></FormControl><FormMessage /></FormItem>)} />
-                  <FormField control={registerForm.control} name="comuna" render={({ field }) => (<FormItem><FormControl><Input placeholder="Comuna" {...field} /></FormControl><FormMessage /></FormItem>)} />
-                  <FormField control={registerForm.control} name="instagram" render={({ field }) => (<FormItem><FormControl><Input placeholder="@instagram" {...field} /></FormControl><FormMessage /></FormItem>)} />
+                  <div className="grid md:grid-cols-2 gap-4">
+                    <FormField control={registerForm.control} name="comuna" render={({ field }) => (<FormItem><FormControl><Input placeholder="Comuna" {...field} /></FormControl><FormMessage /></FormItem>)} />
+                    <FormField control={registerForm.control} name="instagram" render={({ field }) => (<FormItem><FormControl><Input placeholder="@instagram" {...field} /></FormControl><FormMessage /></FormItem>)} />
+                  </div>
 
                   <FormField
                     control={registerForm.control}
