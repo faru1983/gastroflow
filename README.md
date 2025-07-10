@@ -94,4 +94,3 @@ Este proyecto está diseñado para ser la base de una solución SaaS completa. L
 *   **Arquitectura Multi-Tenant:** Adaptar la base de datos para dar soporte a múltiples restaurantes.
 *   **Panel de Administración:** Crear una interfaz de administrador para gestionar la carta, reservas y configuraciones.
 *   **Sistema de Suscripciones:** Integrar **Stripe** para manejar los planes de pago de los restaurantes.
-Hola!
