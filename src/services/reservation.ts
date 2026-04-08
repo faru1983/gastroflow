@@ -2,7 +2,7 @@
 
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { supabaseAnon } from "@/lib/supabase/anon";
+import { getSupabaseAnon } from "@/lib/supabase/anon";
 import { Database } from "@/types/database";
 import { revalidatePath } from "next/cache";
 
@@ -77,7 +77,7 @@ export async function createReservation(formData: {
   notes?: string;
   status?: string;
 }) {
-  const supabase = supabaseAnon;
+  const supabase = getSupabaseAnon();
   
   const { data, error } = await supabase
     .from("reservations")
