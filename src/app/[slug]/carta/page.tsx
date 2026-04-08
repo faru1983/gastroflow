@@ -21,8 +21,8 @@ export default async function MenuPage({ params }: MenuPageProps) {
     notFound();
   }
 
-  const categories = await getMenuCategories(restaurant.id);
-  const items = await getMenuItems(restaurant.id);
+  const categories = await getMenuCategories(restaurant.id) || [];
+  const items = await getMenuItems(restaurant.id) || [];
 
   // Agrupar items por categoría
   const groupedItems = categories.map(cat => ({
