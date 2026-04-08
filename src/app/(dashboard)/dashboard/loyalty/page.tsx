@@ -2,7 +2,7 @@ import { createClient } from "@/lib/supabase/server";
 import { LoyaltyStats } from "./loyalty-stats";
 import { RewardConfig } from "./reward-config";
 import { CustomerRanking } from "./customer-ranking";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/Tabs";
 import { Gift, BarChart3, Users, Settings2 } from "lucide-react";
 
 export default async function LoyaltyDashboardPage() {

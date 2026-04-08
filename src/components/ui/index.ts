@@ -14,3 +14,4 @@ export { Modal } from "./Modal";
 export type { ModalProps } from "./Modal";
 
 export { Skeleton, SkeletonCard, SkeletonList } from "./Skeleton";
+export { Tabs, TabsList, TabsTrigger, TabsContent } from "./Tabs";
