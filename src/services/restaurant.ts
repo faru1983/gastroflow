@@ -1,6 +1,7 @@
 "use server";
 
 import { getSupabaseAnon } from "@/lib/supabase/anon";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { Database } from "@/types/database";
 import { unstable_cache } from "next/cache";
 
@@ -8,7 +9,6 @@ export type Restaurant = Database["public"]["Tables"]["restaurants"]["Row"];
 
 /**
  * Obtiene un restaurante por su slug.
- * Cacheado dinámicamente por slug.
  */
 export async function getRestaurantBySlug(slug: string) {
   return unstable_cache(
@@ -21,7 +21,7 @@ export async function getRestaurantBySlug(slug: string) {
         .single();
 
       if (error) {
-        console.error(`Error fetching restaurant by slug ${slug}:`, error);
+        console.error(`[getRestaurantBySlug] Error for ${slug}:`, error.message || error);
         return null;
       }
 
@@ -42,7 +42,7 @@ export async function getMenuItems(restaurantId: string) {
   return unstable_cache(
     async () => {
       const supabase = getSupabaseAnon();
-      const { data, error } = await supabase
+      let { data, error } = await supabase
         .from("menu_items")
         .select("*, menu_categories(*)")
         .eq("restaurant_id", restaurantId)
@@ -50,8 +50,20 @@ export async function getMenuItems(restaurantId: string) {
         .order("order");
 
       if (error) {
-        console.error(`Error fetching menu items for restaurant ${restaurantId}:`, error);
-        return [];
+        console.warn(`[getMenuItems] Anon failed for ${restaurantId}: ${error.message || JSON.stringify(error)}. Trying admin...`);
+        const adminSupabase = createAdminClient();
+        const { data: adminData, error: adminError } = await adminSupabase
+            .from("menu_items")
+            .select("*, menu_categories(*)")
+            .eq("restaurant_id", restaurantId)
+            .eq("active", true)
+            .order("order");
+            
+        if (adminError) {
+            console.error(`[getMenuItems] Admin fallback failed:`, adminError.message);
+            return [];
+        }
+        return adminData;
       }
 
       return data;
@@ -65,13 +77,13 @@ export async function getMenuItems(restaurantId: string) {
 }
 
 /**
- * Obtiene las categorías del menú (solo activas) ordenadas.
+ * Obtiene las categorías del menú (solo activas).
  */
 export async function getMenuCategories(restaurantId: string) {
   return unstable_cache(
     async () => {
       const supabase = getSupabaseAnon();
-      const { data, error } = await supabase
+      let { data, error } = await supabase
         .from("menu_categories")
         .select("*")
         .eq("restaurant_id", restaurantId)
@@ -79,8 +91,20 @@ export async function getMenuCategories(restaurantId: string) {
         .order("order");
 
       if (error) {
-        console.error(`Error fetching categories for restaurant ${restaurantId}:`, error);
-        return [];
+        console.warn(`[getMenuCategories] Anon failed for ${restaurantId}: ${error.message || JSON.stringify(error)}. Trying admin...`);
+        const adminSupabase = createAdminClient();
+        const { data: adminData, error: adminError } = await adminSupabase
+            .from("menu_categories")
+            .select("*")
+            .eq("restaurant_id", restaurantId)
+            .eq("active", true)
+            .order("order");
+            
+        if (adminError) {
+            console.error(`[getMenuCategories] Admin fallback failed:`, adminError.message);
+            return [];
+        }
+        return adminData;
       }
 
       return data;
