@@ -12,8 +12,10 @@ import {
   X
 } from "lucide-react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
+import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui";
+import { toast } from "sonner";
 
 export default function AdminLayout({
   children,
@@ -21,7 +23,20 @@ export default function AdminLayout({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
+  const router = useRouter();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const supabase = createClient();
+
+  const handleSignOut = async () => {
+    const { error } = await supabase.auth.signOut();
+    if (error) {
+      toast.error("Error al cerrar sesión");
+    } else {
+      router.push("/login");
+      router.refresh();
+      toast.success("Sesión cerrada correctamente");
+    }
+  };
 
   const navItems = [
     { href: "/admin", label: "Resumen", icon: LayoutDashboard },
@@ -54,10 +69,13 @@ export default function AdminLayout({
       </nav>
 
       <div className="p-4 border-t border-outline-variant/30">
-         <Link href="/login" className="flex items-center gap-3 px-4 py-3 rounded-[12px] text-sm font-bold text-error hover:bg-error/10 transition-colors">
+         <button 
+           onClick={handleSignOut}
+           className="w-full flex items-center gap-3 px-4 py-3 rounded-[12px] text-sm font-bold text-error hover:bg-error/10 transition-colors"
+         >
             <LogOut size={20} />
             Cerrar sesión
-         </Link>
+         </button>
       </div>
     </>
   );
