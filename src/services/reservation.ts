@@ -104,7 +104,7 @@ export async function createReservation(formData: {
 export async function getReservationsByDate(restaurantId: string, date: string) {
   const supabase = await createClient();
   
-  const { data, error } = await supabase
+  let { data, error } = await supabase
     .from("reservations")
     .select("*")
     .eq("restaurant_id", restaurantId)
@@ -112,8 +112,20 @@ export async function getReservationsByDate(restaurantId: string, date: string) 
     .order("time");
 
   if (error) {
-    console.error("Error fetching reservations for dashboard:", error);
-    return [];
+    console.warn(`[getReservationsByDate] Primary client failed: ${error.message || JSON.stringify(error)}. Trying admin fallback...`);
+    const adminSupabase = createAdminClient();
+    const { data: adminData, error: adminError } = await adminSupabase
+      .from("reservations")
+      .select("*")
+      .eq("restaurant_id", restaurantId)
+      .eq("date", date)
+      .order("time");
+
+    if (adminError) {
+      console.error("[getReservationsByDate] Admin fallback failed:", adminError.message);
+      return [];
+    }
+    return adminData as Reservation[];
   }
 
   return data as Reservation[];
