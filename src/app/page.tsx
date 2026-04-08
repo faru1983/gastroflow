@@ -391,10 +391,10 @@ export default async function HomePage() {
                 <p className="text-xs text-on-surface-variant/70">
                     © 2026 Gastroflow Inc. Todos los derechos reservados.
                 </p>
-                <div className="flex items-center gap-6 opacity-40 grayscale contrast-0">
-                    <img src="https://upload.wikimedia.org/wikipedia/commons/4/41/Visa_Logo.png" alt="Visa" className="h-5 w-auto object-contain" />
-                    <img src="https://upload.wikimedia.org/wikipedia/commons/b/b7/MasterCard_Logo.svg" alt="Mastercard" className="h-5 w-auto object-contain" />
-                    <img src="https://seeklogo.com/images/T/transbank-logo-F38D9A2AFA-seeklogo.com.png" alt="Transbank" className="h-5 w-auto object-contain" />
+                <div className="flex items-center gap-6 opacity-60 grayscale hover:grayscale-0 hover:opacity-100 transition-all duration-300">
+                    <img src="/images/payments/visa.png" alt="Visa" className="h-5 w-auto object-contain" />
+                    <img src="/images/payments/mastercard.svg" alt="Mastercard" className="h-5 w-auto object-contain" />
+                    <img src="/images/payments/transbank.png" alt="Transbank" className="h-5 w-auto object-contain" />
                 </div>
             </div>
         </div>
