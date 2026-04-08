@@ -149,6 +149,11 @@ NEXT_PUBLIC_APP_URL=
 | 08/04/24 | Caché estática (unstable_cache) | Reducir llamadas a Supabase Free Tier en rutas públicas (Menú, Perfil). |
 | 08/04/24 | Anon Client Server-side | Aplicar RLS correcto en lectura pública, sin depender de cookies() para caché. |
 | 08/04/24 | Revalidate Path Global | Invalida caché de la carta QR y el perfil ante cualquier cambio de menú. |
+| 08/04/24 | TypeScript Vercel Fixes | Resolución de import names (Case Sensitivity) de Windows a Linux. |
+| 08/04/24 | Suspense Boundary Login | Requerimiento de Next.js para rutas con `useSearchParams` estáticas. |
+| 08/04/24 | Llaves estáticas Multi-tenant | Identificadores únicos (`"menu-items", id`) en caché para aislar restaurantes. |
+| 08/04/24 | Admin Fallback | Si `unstable_cache` rompe fetch anónimo, se fuerza AdminClient para no vaciar la carta. |
+| 08/04/24 | Purga rutas Zombie | Borrado de `/carta/[slug]` falso positivo que arrojaba `typecheck` erróneos. |
 
 ---
 
