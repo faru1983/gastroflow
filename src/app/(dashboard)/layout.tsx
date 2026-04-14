@@ -20,9 +20,9 @@ export default async function DashboardLayout({
   return (
     <div className="min-h-screen bg-surface flex">
       <Sidebar />
-      <div className="flex-1 md:ml-64 flex flex-col min-h-screen">
+      <div className="flex-1 md:ml-64 flex flex-col min-h-screen min-w-0">
         <Header restaurantName={restaurantName} />
-        <main className="flex-1 p-4 md:p-8">
+        <main className="flex-1 p-4 md:p-8 w-full max-w-full min-w-0 overflow-x-hidden">
           {children}
         </main>
         

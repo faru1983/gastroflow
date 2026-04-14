@@ -116,3 +116,42 @@ export async function getMenuCategories(restaurantId: string) {
     }
   )();
 }
+
+/**
+ * Obtiene un restaurante por su ID (uso administrativo).
+ */
+export async function getRestaurantById(id: string) {
+  const adminSupabase = createAdminClient();
+  const { data, error } = await adminSupabase
+    .from("restaurants")
+    .select("*")
+    .eq("id", id)
+    .single();
+
+  if (error) {
+    console.error(`[getRestaurantById] Error for ${id}:`, error.message);
+    return null;
+  }
+
+  return data as Restaurant;
+}
+
+/**
+ * Actualiza los datos de un restaurante.
+ */
+export async function updateRestaurant(id: string, updates: Partial<Database["public"]["Tables"]["restaurants"]["Update"]>) {
+  const adminSupabase = createAdminClient();
+  const { data, error } = await adminSupabase
+    .from("restaurants")
+    .update(updates)
+    .eq("id", id)
+    .select()
+    .single();
+
+  if (error) {
+    console.error(`[updateRestaurant] Error:`, error.message);
+    throw new Error(error.message);
+  }
+
+  return data as Restaurant;
+}

@@ -2,20 +2,19 @@ import { getRestaurantBySlug } from "@/services/restaurant";
 import { notFound } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
-import { Button, Card, Badge } from "@/components/ui";
 import { 
+  UtensilsCrossed, 
+  CalendarDays, 
   MapPin, 
+  Star, 
   Phone, 
-  Clock, 
-  UtensilsCrossed,
-  CalendarDays,
-  ChevronRight,
-  Heart,
+  Mail, 
   Globe,
-  Mail,
-  Star,
-  MessageSquare
+  ChevronRight,
+  Clock,
+  Heart
 } from "lucide-react";
+import { Button, Card, Badge } from "@/components/ui";
 import RestaurantFooter from "@/components/restaurant/RestaurantFooter";
 
 interface RestaurantLandingProps {
@@ -32,7 +31,6 @@ export default async function RestaurantLandingPage({ params }: RestaurantLandin
 
   // Parsear horarios
   const openingHours = restaurant.opening_hours as Record<string, string> | null;
-  const socialLinks = restaurant.social_links as Record<string, string> | null;
 
   // Días en orden para mostrar
   const daysOrder = [
@@ -46,7 +44,7 @@ export default async function RestaurantLandingPage({ params }: RestaurantLandin
   ];
 
   return (
-    <main className="min-h-screen bg-surface">
+    <>
       {/* Hero / Banner */}
       <div className="relative h-64 md:h-80 w-full overflow-hidden">
         {restaurant.banner_url ? (
@@ -64,7 +62,7 @@ export default async function RestaurantLandingPage({ params }: RestaurantLandin
         
         {/* Floating Logo */}
         <div className="absolute bottom-4 left-6 z-10 transition-transform active:scale-95">
-          <div className="w-20 h-20 rounded-[20px] bg-surface-container flex items-center justify-center border-4 border-surface shadow-2xl overflow-hidden relative">
+          <div className="w-20 h-20 rounded-xl bg-surface-container flex items-center justify-center border-4 border-surface shadow-2xl overflow-hidden relative">
             {restaurant.logo_url ? (
               <Image src={restaurant.logo_url} alt={restaurant.name} fill className="object-cover" />
             ) : (
@@ -91,13 +89,13 @@ export default async function RestaurantLandingPage({ params }: RestaurantLandin
 
         {/* Quick Actions */}
         <div className="grid grid-cols-2 gap-3 mb-4">
-          <Button asChild size="lg" className="h-20 flex-col gap-1 items-center justify-center rounded-[14px] shadow-lg shadow-primary/10">
+          <Button asChild size="lg" className="h-20 flex-col gap-1 items-center justify-center rounded-xl shadow-lg shadow-primary/10">
             <Link href={`/${slug}/carta`}>
                 <UtensilsCrossed size={20} />
                 <span className="text-xs font-bold">Ver Carta</span>
             </Link>
           </Button>
-          <Button variant="outline" asChild size="lg" className="h-20 flex-col gap-1 items-center justify-center rounded-[14px] border-outline-variant/30">
+          <Button variant="outline" asChild size="lg" className="h-20 flex-col gap-1 items-center justify-center rounded-xl border-outline-variant/30">
             <Link href={`/${slug}/reserva`}>
                 <CalendarDays size={20} className="text-tertiary" />
                 <span className="text-xs font-bold">Reservar</span>
@@ -107,7 +105,7 @@ export default async function RestaurantLandingPage({ params }: RestaurantLandin
 
         {/* Loyalty Program CTA */}
         {restaurant.loyalty_stamps_reward_enabled && (
-          <Card className="p-4 mb-10 border-none bg-linear-to-br from-primary/10 to-primary/5 rounded-[16px] relative overflow-hidden group active:scale-[0.98] transition-all">
+          <Card className="p-4 mb-10 border-none bg-linear-to-br from-primary/10 to-primary/5 rounded-xl relative overflow-hidden group active:scale-[0.98] transition-all">
             <div className="absolute -right-4 -top-4 w-24 h-24 bg-primary/10 rounded-full blur-2xl group-hover:bg-primary/20 transition-colors" />
             <Link href={`/${slug}/fidelidad`} className="flex items-center justify-between">
               <div className="flex items-center gap-4">
@@ -138,12 +136,13 @@ export default async function RestaurantLandingPage({ params }: RestaurantLandin
                   <p className="text-[11px] font-bold text-tertiary uppercase tracking-wider mb-2">Horarios</p>
                   <div className="space-y-1.5">
                     {daysOrder.map(({ key, label }) => {
-                      const hours = openingHours[key];
-                      if (!hours) return null;
+                      const hours = openingHours?.[key];
                       return (
                         <div key={key} className="flex justify-between text-sm">
                           <span className="text-on-surface-variant">{label}</span>
-                          <span className="text-on-surface font-medium tabular-nums">{hours}</span>
+                          <span className={`${hours ? 'text-on-surface font-medium' : 'text-error/70 font-bold'} tabular-nums`}>
+                            {hours || "Cerrado"}
+                          </span>
                         </div>
                       );
                     })}
@@ -156,15 +155,15 @@ export default async function RestaurantLandingPage({ params }: RestaurantLandin
           {/* Ubicación y Reseñas Google */}
           <div className="mb-8 p-1">
             <h3 className="text-[10px] font-bold text-outline uppercase tracking-[0.2em] mb-4">Ubicación y Calificación</h3>
-            <Card className="p-5 border-none bg-surface-container-low rounded-[24px] overflow-hidden relative group">
+            <Card className="p-5 border-none bg-surface-container-low rounded-xl overflow-hidden relative group">
                 <div className="flex justify-between items-start mb-4">
                     <a 
-                      href={(restaurant as any).google_maps_review_url || 'https://cocktailsontap.cl/google'} 
+                      href={restaurant.google_maps_review_url || '#'} 
                       target="_blank" 
                       rel="noopener noreferrer"
                       className="flex items-center gap-3 hover:opacity-80 transition-opacity group"
                     >
-                        <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center shadow-md group-hover:shadow-lg transition-all">
+                        <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center shadow-md group-hover:shadow-lg transition-all border border-outline-variant/20">
                             <svg viewBox="0 0 24 24" className="w-6 h-6" fill="#4285F4">
                                 <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
                                 <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-1 .67-2.28 1.07-3.71 1.07-2.85 0-5.27-1.92-6.14-4.51H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853" />
@@ -174,10 +173,10 @@ export default async function RestaurantLandingPage({ params }: RestaurantLandin
                         </div>
                         <div>
                             <div className="flex items-center gap-1">
-                                <span className="text-xl font-black">{(restaurant as any).google_rating || '4.8'}</span>
+                                <span className="text-xl font-black">{restaurant.google_rating || '5.0'}</span>
                                 <div className="flex">
                                     {[1, 2, 3, 4, 5].map((s) => (
-                                        <Star key={s} size={14} className="fill-tertiary text-tertiary" />
+                                        <Star key={s} size={14} className={`${s <= (restaurant.google_rating || 5) ? 'fill-tertiary text-tertiary' : 'text-outline-variant'}`} />
                                     ))}
                                 </div>
                             </div>
@@ -207,85 +206,89 @@ export default async function RestaurantLandingPage({ params }: RestaurantLandin
           <div className="mb-10 text-center">
             <h3 className="text-[10px] font-bold text-outline uppercase tracking-[0.3em] mb-5">Redes y Contacto</h3>
             <div className="flex flex-wrap gap-4 justify-center">
-              {/* WhatsApp Oficial SVG */}
-              {(restaurant as any).whatsapp_number && (
+              {[
+                restaurant.whatsapp_number && {
+                  href: `https://wa.me/${restaurant.whatsapp_number.replace(/\+/g, '')}`,
+                  icon: (
+                    <svg viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5">
+                      <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z" />
+                    </svg>
+                  ),
+                  color: "#25D366",
+                  bgColor: "rgba(37, 211, 102, 0.1)"
+                },
+                restaurant.instagram_url && {
+                  href: restaurant.instagram_url,
+                  icon: (
+                    <svg viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5">
+                      <path d="M12 2.163c3.204 0 3.584.012 4.85.07 1.366.062 2.633.332 3.608 1.308.975.975 1.247 2.242 1.308 3.607.058 1.266.07 1.646.07 4.85s-.012 3.584-.07 4.85c-.062 1.366-.332 2.633-1.308 3.608-.975.975-2.242 1.247-3.607 1.308-1.266.058-1.646.07-4.85.07s-3.584-.012-4.85-.07c-1.366-.062-2.633-.332-3.608-1.308-.975-.975-1.247-2.242-1.308-3.607-.058-1.266-.07-1.646-.07-4.85s.012-3.584.07-4.85c.062-1.366.332-2.633 1.308-3.608.975-.975 2.242-1.247 3.607-1.308 1.266-.058 1.646-.07 4.85-.07zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.355 2.618 6.778 6.98 6.978 1.28.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.668-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4.162 4.162 0 110-8.324A4.162 4.162 0 0112 16zM18.406 4.41a1.44 1.44 0 100 2.88 1.44 1.44 0 000-2.88z" />
+                    </svg>
+                  ),
+                  color: "#E1306C",
+                  bgColor: "rgba(225, 48, 108, 0.1)"
+                },
+                restaurant.facebook_url && {
+                  href: restaurant.facebook_url,
+                  icon: (
+                    <svg viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5">
+                      <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
+                    </svg>
+                  ),
+                  color: "#1877F2",
+                  bgColor: "rgba(24, 119, 242, 0.1)"
+                },
+                restaurant.tiktok_url && {
+                  href: restaurant.tiktok_url,
+                  icon: (
+                    <svg viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5">
+                      <path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.17-2.89-.6-4.13-1.47-.13-.08-.25-.17-.38-.25-.01 3.03.01 6.07-.02 9.11-.03 1.5-.31 3.04-1.03 4.39-.77 1.48-2.02 2.65-3.51 3.32-1.49.66-3.13.91-4.72.78-1.5-.12-3.04-.63-4.22-1.57C2.7 21.05 1.69 19 1.46 16.94c-.13-1.4-.04-2.85.5-4.16.63-1.54 1.78-2.84 3.25-3.61 1.09-.59 2.33-.87 3.57-.91.02 1.37.01 2.74.01 4.11-1.03.11-2.03.55-2.69 1.35-.61.83-.87 1.94-.64 2.94.22 1.01.91 1.93 1.83 2.37 1.02.48 2.27.42 3.23-.19.82-.53 1.32-1.45 1.35-2.42.06-2.9.02-5.79.02-8.69-.02-2.58-.04-5.16-.02-7.74z" />
+                    </svg>
+                  ),
+                  color: "#000000",
+                  bgColor: "rgba(0, 0, 0, 0.1)"
+                },
+                restaurant.contact_phone && {
+                  href: `tel:${restaurant.contact_phone}`,
+                  icon: <Phone size={20} strokeWidth={2.5} />,
+                  color: "var(--primary)",
+                  bgColor: "color-mix(in srgb, var(--primary) 10%, transparent)"
+                },
+                restaurant.contact_email && {
+                  href: `mailto:${restaurant.contact_email}`,
+                  icon: <Mail size={20} strokeWidth={2.5} />,
+                  color: "var(--primary)",
+                  bgColor: "color-mix(in srgb, var(--primary) 10%, transparent)"
+                },
+                restaurant.website && {
+                  href: restaurant.website,
+                  icon: <Globe size={20} strokeWidth={2.5} />,
+                  color: "var(--primary)",
+                  bgColor: "color-mix(in srgb, var(--primary) 10%, transparent)"
+                }
+              ].filter(Boolean).map((item: any, idx) => (
                 <a 
-                  href={`https://wa.me/${(restaurant as any).whatsapp_number.replace(/\+/g, '')}`}
+                  key={idx}
+                  href={item.href}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="w-12 h-12 rounded-[18px] bg-[#25D366]/10 flex items-center justify-center text-[#25D366] hover:scale-110 active:scale-95 transition-all shadow-sm border border-[#25D366]/10"
+                  className="group relative w-12 h-12 flex items-center justify-center transition-all duration-300"
+                  style={{ 
+                    '--accent-color': item.color,
+                    '--bg-soft': item.bgColor 
+                  } as React.CSSProperties}
                 >
-                  <svg viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6">
-                    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z" />
-                  </svg>
+                  <div className="absolute inset-0 bg-[var(--bg-soft)] rounded-xl border border-white/5 shadow-sm group-hover:shadow-[0_4px_15px_rgba(0,0,0,0.1)] transition-all duration-300 group-hover:scale-105" />
+                  <div className="relative z-10 text-[var(--accent-color)] group-hover:scale-110 transition-transform duration-300">
+                    {item.icon}
+                  </div>
                 </a>
-              )}
-
-              {/* Instagram SVG */}
-              {(restaurant as any).instagram_url && (
-                <a 
-                  href={(restaurant as any).instagram_url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="w-12 h-12 rounded-[18px] bg-[#E1306C]/10 flex items-center justify-center text-[#E1306C] hover:scale-110 active:scale-95 transition-all shadow-sm border border-[#E1306C]/10"
-                >
-                  <svg viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6">
-                    <path d="M12 2.163c3.204 0 3.584.012 4.85.07 1.366.062 2.633.332 3.608 1.308.975.975 1.247 2.242 1.308 3.607.058 1.266.07 1.646.07 4.85s-.012 3.584-.07 4.85c-.062 1.366-.332 2.633-1.308 3.608-.975.975-2.242 1.247-3.607 1.308-1.266.058-1.646.07-4.85.07s-3.584-.012-4.85-.07c-1.366-.062-2.633-.332-3.608-1.308-.975-.975-1.247-2.242-1.308-3.607-.058-1.266-.07-1.646-.07-4.85s.012-3.584.07-4.85c.062-1.366.332-2.633 1.308-3.608.975-.975 2.242-1.247 3.607-1.308 1.266-.058 1.646-.07 4.85-.07zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.355 2.618 6.778 6.98 6.978 1.28.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.668-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4.162 4.162 0 110-8.324A4.162 4.162 0 0112 16zM18.406 4.41a1.44 1.44 0 100 2.88 1.44 1.44 0 000-2.88z" />
-                  </svg>
-                </a>
-              )}
-
-              {/* TikTok */}
-              {(restaurant as any).tiktok_url && (
-                <a 
-                  href={(restaurant as any).tiktok_url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="w-12 h-12 rounded-[18px] bg-on-surface/5 flex items-center justify-center text-on-surface hover:scale-110 active:scale-95 transition-all shadow-sm border border-on-surface/10"
-                >
-                  <svg viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6">
-                    <path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.17-2.89-.6-4.13-1.47-.13-.08-.25-.17-.38-.25-.01 3.03.01 6.07-.02 9.11-.03 1.5-.31 3.04-1.03 4.39-.77 1.48-2.02 2.65-3.51 3.32-1.49.66-3.13.91-4.72.78-1.5-.12-3.04-.63-4.22-1.57C2.7 21.05 1.69 19 1.46 16.94c-.13-1.4-.04-2.85.5-4.16.63-1.54 1.78-2.84 3.25-3.61 1.09-.59 2.33-.87 3.57-.91.02 1.37.01 2.74.01 4.11-1.03.11-2.03.55-2.69 1.35-.61.83-.87 1.94-.64 2.94.22 1.01.91 1.93 1.83 2.37 1.02.48 2.27.42 3.23-.19.82-.53 1.32-1.45 1.35-2.42.06-2.9.02-5.79.02-8.69-.02-2.58-.04-5.16-.02-7.74z" />
-                  </svg>
-                </a>
-              )}
-
-              {/* Teléfono Directo */}
-              {restaurant.contact_phone && (
-                <a 
-                  href={`tel:${restaurant.contact_phone}`}
-                  className="w-12 h-12 rounded-[18px] bg-primary/10 flex items-center justify-center text-primary hover:scale-110 active:scale-95 transition-all shadow-sm border border-primary/10"
-                >
-                  <Phone size={22} strokeWidth={2} />
-                </a>
-              )}
-
-              {/* Email Contacto */}
-              {restaurant.contact_email && (
-                <a 
-                  href={`mailto:${restaurant.contact_email}`}
-                  className="w-12 h-12 rounded-[18px] bg-surface-container flex items-center justify-center text-on-surface-variant hover:scale-110 active:scale-95 transition-all shadow-sm border border-outline/10"
-                >
-                  <Mail size={22} strokeWidth={2} />
-                </a>
-              )}
-
-              {/* Website */}
-              {(restaurant as any).website && (
-                <a 
-                  href={(restaurant as any).website}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="w-12 h-12 rounded-[18px] bg-surface-container flex items-center justify-center text-on-surface-variant hover:scale-110 active:scale-95 transition-all shadow-sm border border-outline/10"
-                >
-                  <Globe size={22} strokeWidth={2} />
-                </a>
-              )}
+              ))}
             </div>
           </div>
         </div>
       </div>
 
       <RestaurantFooter />
-    </main>
+    </>
   );
 }

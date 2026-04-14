@@ -471,8 +471,13 @@ export type Database = {
           contact_phone: string | null
           created_at: string | null
           description: string | null
+          facebook_url: string | null
           featured_dish_id: string | null
+          google_maps_review_url: string | null
+          google_rating: number | null
           id: string
+          instagram_url: string | null
+          is_featured: boolean | null
           logo_url: string | null
           loyalty_birthday_reward_enabled: boolean | null
           loyalty_birthday_reward_text: string | null
@@ -490,8 +495,12 @@ export type Database = {
           slug: string
           social_links: Json | null
           subscription_status: string
+          tiktok_url: string | null
           trial_ends_at: string | null
           updated_at: string | null
+          website: string | null
+          whatsapp_number: string | null
+          theme_config: Json | null
         }
         Insert: {
           address?: string | null
@@ -500,8 +509,13 @@ export type Database = {
           contact_phone?: string | null
           created_at?: string | null
           description?: string | null
+          facebook_url?: string | null
           featured_dish_id?: string | null
+          google_maps_review_url?: string | null
+          google_rating?: number | null
           id?: string
+          instagram_url?: string | null
+          is_featured?: boolean | null
           logo_url?: string | null
           loyalty_birthday_reward_enabled?: boolean | null
           loyalty_birthday_reward_text?: string | null
@@ -519,8 +533,12 @@ export type Database = {
           slug: string
           social_links?: Json | null
           subscription_status?: string
+          tiktok_url?: string | null
           trial_ends_at?: string | null
           updated_at?: string | null
+          website?: string | null
+          whatsapp_number?: string | null
+          theme_config?: Json | null
         }
         Update: {
           address?: string | null
@@ -529,8 +547,13 @@ export type Database = {
           contact_phone?: string | null
           created_at?: string | null
           description?: string | null
+          facebook_url?: string | null
           featured_dish_id?: string | null
+          google_maps_review_url?: string | null
+          google_rating?: number | null
           id?: string
+          instagram_url?: string | null
+          is_featured?: boolean | null
           logo_url?: string | null
           loyalty_birthday_reward_enabled?: boolean | null
           loyalty_birthday_reward_text?: string | null
@@ -548,8 +571,12 @@ export type Database = {
           slug?: string
           social_links?: Json | null
           subscription_status?: string
+          tiktok_url?: string | null
           trial_ends_at?: string | null
           updated_at?: string | null
+          website?: string | null
+          whatsapp_number?: string | null
+          theme_config?: Json | null
         }
         Relationships: []
       }
